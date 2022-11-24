@@ -20,6 +20,12 @@ a:hover {
 	text-align: center;
 	font-weight: bold;
 }
+.infoBox {
+	margin: .5em 1em;
+	border-radius: 1em;
+	background-color: lightgray;
+	padding: .5em 1em;
+}
 
 /* site header */
 #mainHeader {
@@ -217,12 +223,4 @@ a:hover {
 }
 .pagination > * {
 	padding: 0 .5em;
-}
-
-/* user page */
-.infoBox {
-	margin: .5em 1em;
-	border-radius: 1em;
-	background-color: lightgray;
-	padding: .5em 1em;
 }

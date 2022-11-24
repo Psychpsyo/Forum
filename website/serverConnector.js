@@ -260,6 +260,27 @@ async function getThreadInfo(threadID) {
 	return data["thread"];
 }
 
+async function getForumInfo() {
+	let response = await fetch(apiEndpoint, {
+		method: "POST",
+		headers: {
+			"Content-Type": "text/plain",
+		},
+		body: JSON.stringify({
+			"action": "getForumInfo",
+			"userID": localStorage.getItem("userID"),
+			"token": localStorage.getItem("userToken")
+		})
+	});
+	
+	if (!response.ok) {
+		return [];
+	}
+	
+	let data = await response.json();
+	return data;
+}
+
 // hashes a password with 200000 iterations of PBKDF2 (SHA-512) for it to be sent to the server.
 // this is done so that the user can verify that the server never even gets to see the plaintext password.
 // the password is additionally salted with the username and the string "Psych'sForumSalt", meaning it'll be unique across users and other applications.

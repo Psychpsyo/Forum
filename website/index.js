@@ -111,8 +111,33 @@ async function showThreadList(page) {
 	for (const thread of threadList.threads) {
 		await getUserInfo(thread.author);
 	}
-	pageTitleText.textContent = "Recent Threads";
+	let forumInfo = await getForumInfo();
+	let newestUser = await getUserInfo(forumInfo.newestUser);
+	pageTitleText.textContent = "Homepage";
 	pageContent.innerHTML = "";
+	
+	let infoBox = document.createElement("div");
+	infoBox.classList.add("infoBox");
+	infoBox.appendChild(document.createTextNode("Welcome to the forum!"));
+	infoBox.appendChild(document.createElement("br"));
+	infoBox.appendChild(document.createTextNode("We currently have " + forumInfo.userCount + " users who have written " + forumInfo.postCount + " posts in " + forumInfo.threadCount + " threads."));
+	infoBox.appendChild(document.createElement("br"));
+	infoBox.appendChild(document.createTextNode("Our newest user is "));
+	let newestUserLink = document.createElement("a");
+	newestUserLink.textContent = newestUser.name;
+	newestUserLink.dataset.userId = newestUser.id;
+	newestUserLink.addEventListener("click", function(e) {
+		showUser(parseInt(this.dataset.userId));
+	});
+	infoBox.appendChild(newestUserLink);
+	infoBox.appendChild(document.createTextNode("."));
+	pageContent.appendChild(infoBox);
+	
+	let postsHeader = document.createElement("div");
+	postsHeader.classList.add("sectionHeader");
+	postsHeader.textContent = "All Threads:"
+	pageContent.appendChild(postsHeader);
+	
 	let paginationTop = buildPagination(page, Math.floor((threadList.threadCount - 1) / 10), function() {
 		showThreadList(parseInt(this.dataset.page));
 	});

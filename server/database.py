@@ -157,6 +157,18 @@ def getUserInfo(userID, token, requestedUserID):
 	userPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE author = ?", (requestedUserID,)).fetchone()
 	return {"id": user[0], "name": user[1], "registrationDate": user[2], "postCount": userPostCount[0]}
 
+def getForumInfo(userID, token):
+	newestUserID = cur.execute("SELECT id FROM users ORDER BY date DESC", ()).fetchone()
+	if newestUserID == None:
+		return None
+	
+	return {
+		"newestUser": newestUserID[0],
+		"userCount": cur.execute("SELECT COUNT(*) FROM users", ()).fetchone()[0],
+		"postCount": cur.execute("SELECT COUNT(*) FROM posts", ()).fetchone()[0],
+		"threadCount": cur.execute("SELECT COUNT(*) FROM threads", ()).fetchone()[0]
+	}
+
 def getThreadInfo(userID, token, threadID):
 	if not authenticateToken(userID, token):
 		return None

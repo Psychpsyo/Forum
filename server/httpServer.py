@@ -58,6 +58,11 @@ class HttpServer(BaseHTTPRequestHandler):
 				self.respondOK({"user": user})
 				return;
 			
+			if query["action"] == "getForumInfo":
+				forumInfo = db.getForumInfo(query["userID"], query["token"])
+				self.respondOK(forumInfo)
+				return;
+			
 			if query["action"] == "getThreadInfo":
 				thread = db.getThreadInfo(query["userID"], query["token"], query["threadID"])
 				self.respondOK({"thread": thread})
