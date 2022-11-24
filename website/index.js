@@ -151,8 +151,13 @@ async function showThread(threadID, page) {
 	let newPostTextbox = newPostTemplate.content.firstElementChild.cloneNode(true);
 	newPostTextbox.querySelector(".newPostSubmit").dataset.threadId = threadID;
 	newPostTextbox.querySelector(".newPostSubmit").addEventListener("click", async function() {
+		let postContent = this.parentElement.parentElement.querySelector(".newPostTextbox").innerText;
+		if (postContent.length > 8000) {
+			alert("That's too long!\nKeep it below 8000 characters, please.");
+			return;
+		}
 		let threadID = parseInt(this.dataset.threadId, 10);
-		let newPostID = await createPost(threadID, this.parentElement.parentElement.querySelector(".newPostTextbox").innerText);
+		let newPostID = await createPost(threadID, postContent);
 		if (newPostID == -1) {
 			alert("Failed to create post.");
 		} else {

@@ -163,6 +163,7 @@ a:hover {
 }
 .postRight {
 	flex-grow: 1;
+	overflow: hidden;
 }
 .postHeader {
 	padding: .65em;
@@ -177,6 +178,7 @@ a:hover {
 	background-color: white;
 	white-space: pre-wrap;
 	font-family: monospace;
+	overflow: hidden;
 }
 
 .newPost {
