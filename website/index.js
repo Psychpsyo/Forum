@@ -105,7 +105,11 @@ async function buildPost(postInfo) {
 	return postElement;
 }
 
-async function showThreadList(page) {
+async function showHomepage(page, fromHistory = false) {
+	if (!fromHistory) {
+		history.pushState({"page": "home", "threadPage": page}, "");
+	}
+	
 	let threadList = await getThreads(page);
 	// load all authors before writing anything to the page
 	for (const thread of threadList.threads) {
@@ -139,7 +143,7 @@ async function showThreadList(page) {
 	pageContent.appendChild(postsHeader);
 	
 	let paginationTop = buildPagination(page, Math.floor((threadList.threadCount - 1) / 10), function() {
-		showThreadList(parseInt(this.dataset.page));
+		showHomepage(parseInt(this.dataset.page));
 	});
 	pageContent.appendChild(paginationTop);
 	for (const thread of threadList.threads) {
@@ -162,13 +166,17 @@ async function showThreadList(page) {
 		pageContent.appendChild(threadElement);
 	}
 	let paginationBottom = buildPagination(page, Math.floor((threadList.threadCount - 1) / 10), function() {
-		showThreadList(parseInt(this.dataset.page));
+		showHomepage(parseInt(this.dataset.page));
 	});
 	pageContent.appendChild(paginationBottom);
 	pageContent.appendChild(document.createElement("br"));
 }
 
-async function showThread(threadID, page) {
+async function showThread(threadID, page, fromHistory = false) {
+	if (!fromHistory) {
+		history.pushState({"page": "thread", "thread": threadID, "threadPage": page}, "");
+	}
+	
 	let threadInfo = await getThreadInfo(threadID);
 	let posts = await getPosts(threadID, page);
 	// load all authors before writing anything to the page
@@ -215,7 +223,11 @@ async function showThread(threadID, page) {
 	pageContent.appendChild(document.createElement("br"));
 }
 
-async function showUser(userID) {
+async function showUser(userID, fromHistory = false) {
+	if (!fromHistory) {
+		history.pushState({"page": "user", "user": userID}, "");
+	}
+	
 	let user = await getUserInfo(userID);
 	let recentPosts = await getUserPosts(userID, 0);
 	pageTitleText.textContent = "User: \"" + user.name + "\"";
@@ -253,7 +265,7 @@ function setLoggedInView() {
 	errorDiv.style.display = "none";
 	pageTitle.style.display = "block";
 	
-	showThreadList(0);
+	showHomepage(0);
 }
 
 function closeOverlays() {
@@ -268,7 +280,10 @@ function openOverlay(overlay) {
 }
 
 // button events
-forumName.addEventListener("click", function() {showThreadList(0);});
+forumName.addEventListener("click", function() {
+	showHomepage(0);
+	history.pushState()
+});
 logoutButton.addEventListener("click", logout);
 overlayBackdrop.addEventListener("click", closeOverlays);
 
@@ -369,4 +384,19 @@ newThreadSubmitButton.addEventListener("click", function() {
 		closeOverlays();
 		showThread(threadID, 0);
 	});
+});
+
+// history
+window.addEventListener("popstate", function(e) {
+	switch (e.state.page) {
+		case "user":
+			showUser(e.state.user, true);
+			break;
+		case "thread":
+			showThread(e.state.thread, e.state.threadPage, true);
+			break;
+		case "home":
+			showHomepage(e.state.threadPage, true);
+			break;
+	}
 });
