@@ -1,0 +1,213 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+body {
+	background-image: url("/images/background.png");
+	background-size: 2vw;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+}
+a {
+	color: #3a5b98;
+	cursor: pointer;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+
+/* site header */
+#mainHeader {
+	background-color: white;
+	z-index: 100;
+	position: fixed;
+	width: 100vw;
+	height: 3em;
+	padding: 0 1em;
+	box-sizing: border-box;
+	filter: drop-shadow(0 0 .75vw black);
+	
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+#forumName {
+	cursor: pointer;
+}
+#loggedInHeaderOptions {
+	display: none;
+}
+
+
+/* center column */
+#centerColumn {
+	background-color: white;
+	min-height: 100vh;
+	padding-top: 3em;
+	box-sizing: border-box;
+	width: calc(max(50%, 50em));
+	margin: 0 auto;
+	filter: drop-shadow(0 0 1vw black);
+}
+#pageTitle {
+	display: none;
+	text-align: center;
+	font-weight: bold;
+	padding-top: .5em;
+	font-size: 2em;
+}
+#errorDiv {
+	display: none;
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	padding-top: 40vh;
+	font-size: 1.5em;
+	color: gray;
+}
+
+
+/* overlays and popups */
+#overlayBackdrop {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, .5);
+	z-index: 1000;
+}
+.overlay {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	
+	background-color: white;
+	border-radius: 1em;
+	z-index: 1001;
+}
+.overlayTitle {
+	font-weight: bold;
+	padding: 1em;
+	padding-bottom: 0;
+}
+.overlayBody {
+	line-height: 1.5em;
+	padding: 1em;
+	padding-top: 0;
+}
+
+.formWarning {
+	display: none;
+	font-size: .75em;
+	color: red;
+	background-color: rgba(255, 0, 0, .25);
+	padding: .25em .5em;
+	border-radius: .5em;
+}
+
+
+/* thread boxes */
+.thread {
+	margin: .5em 1em;
+	border-radius: 1em;
+	background-color: lightgray;
+	transition: background-color .25s;
+}
+.thread:hover {
+	background-color: lightblue;
+}
+.threadHeader {
+	padding: .65em;
+	padding-bottom: 0;
+	display: flex;
+	justify-content: space-between;
+}
+.threadName {
+	font-weight: bold;
+}
+.threadInfo {
+	padding: .65em;
+	padding-top: 0;
+}
+
+
+/* posts */
+.post {
+	display: flex;
+	margin: .5em 1em;
+	border-radius: 1em;
+	background-color: lightgray;
+}
+.postLeft {
+	padding: .65em;
+	border-right: 2px solid black;
+	min-width: 10em;
+	max-width: 10em;
+	overflow: hidden;
+	text-align: center;
+}
+.postAuthor {
+	font-weight: bold;
+}
+.postAuthorPostCount {
+	font-size: .75em;
+}
+.postAuthorRegistered {
+	font-size: .75em;
+}
+.postRight {
+	flex-grow: 1;
+}
+.postHeader {
+	padding: .65em;
+	padding-bottom: 0;
+	display: flex;
+	justify-content: space-between;
+}
+.postContent {
+	margin: .65em;
+	margin-top: 0;
+	padding: .25em .5em;
+	background-color: white;
+	white-space: pre-wrap;
+}
+
+.newPost {
+	margin: .5em 1em;
+	border-radius: 1em;
+	background-color: lightgray;
+	padding: .65em;
+}
+.newPostHeader {
+	padding-left: .25em;
+}
+.newPostTextbox {
+	padding: .25em .5em;
+	background-color: white;
+	min-height: 4em;
+	margin: .5em 0;
+	white-space: pre-wrap;
+}
+.newPostFooter {
+	display: flex;
+	justify-content: end;
+	padding-right: .25em;
+}
+
+/* pagination */
+.pagination {
+	margin: .5em 1em;
+	border-radius: 1em;
+	background-color: lightgray;
+	padding: .2em .5em;
+	text-align: center;
+}
+.pagination > * {
+	padding: 0 .5em;
+}

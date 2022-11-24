@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Psych's cool forum!</title>
+		<link rel="stylesheet" href="index.css">
+	</head>
+	<body>
+		<header id="mainHeader">
+			<div id="forumName">
+				<b>Psych's cool Forum!</b>
+			</div>
+			<div>
+				<div id="loggedOutHeaderOptions">
+					<button id="loginButton">Login</button>
+					|
+					<button id="createAccountButton">Create Account</button>
+				</div>
+				<div id="loggedInHeaderOptions">
+					<button id="newThreadButton">Create New Thread</button>
+					|
+					<button id="logoutButton">Logout</button>
+				</div>
+			</div>
+		</header>
+		<div id="centerColumn">
+			<div id="pageTitle">
+				<span id="pageTitleText">Recent Threads</span>
+				<hr>
+			</div>
+			<div id="pageContent">
+				<!-- content gets put here from js -->
+			</div>
+			<div id="errorDiv">
+				Only members with an account can view this forum.<br>
+				Sorry.
+			</div>
+		</div>
+		
+		<div id="overlayBackdrop"></div>
+		<div id="accountCreationOverlay" class="overlay">
+			<div class="overlayTitle">Create an Account</div>
+			<hr>
+			<div class="overlayBody">
+				<label for="accountCreationUsername">Username:</label><br>
+				<input type="text" id="accountCreationUsername" alt="Enter your desired username here."><br>
+				<span id="accountCreationUsernameWarning" class="formWarning">Must not be empty<br></span>
+				
+				<label for="accountCreationPassword">Password:</label><br>
+				<input type="password" id="accountCreationPassword" alt="Enter your desired password here."><br>
+				<span id="accountCreationPasswordWarning" class="formWarning">Must not be empty<br></span>
+				
+				<label for="accountCreationRepeatPassword">Repeat Password:</label><br>
+				<input type="password" id="accountCreationRepeatPassword" alt="Repeat your desired password here."><br>
+				<span id="accountCreationRepeatPasswordWarning" class="formWarning">Does not match 'Password'<br></span>
+				
+				<label for="accountCreationInviteCode">Invite Code:</label><br>
+				<input type="text" id="accountCreationInviteCode" alt="Enter the invite code you received."><br>
+				<span id="accountCreationInviteCodeWarning" class="formWarning">Must not be empty<br></span>
+				<br>
+				<button id="accountCreationSubmitButton">Submit</button>
+			</div>
+		</div>
+		
+		<div id="loginOverlay" class="overlay">
+			<div class="overlayTitle">Login</div>
+			<hr>
+			<div class="overlayBody">
+				<label for="loginUsername">Username:</label><br>
+				<input type="text" id="loginUsername" alt="Enter your username here."><br>
+				<span id="loginUsernameWarning" class="formWarning">Must not be empty<br></span>
+				
+				<label for="loginPassword">Password:</label><br>
+				<input type="password" id="loginPassword" alt="Enter your password here."><br>
+				<span id="loginPasswordWarning" class="formWarning">Must not be empty<br></span>
+				<br>
+				<button id="loginSubmitButton">Submit</button>
+			</div>
+		</div>
+		
+		<div id="newThreadOverlay" class="overlay">
+			<div class="overlayTitle">Create New Thread</div>
+			<hr>
+			<div class="overlayBody">
+				<label for="newThreadName">Title:</label><br>
+				<input type="text" id="newThreadName" alt="Enter the thread's title here."><br>
+				<span id="newThreadNameWarning" class="formWarning">Must not be empty<br></span>
+				
+				<label for="newThreadPost">Post:</label><br>
+				<textarea type="text" id="newThreadPost" alt="Enter the initial post content here." rows="7" cols="70"></textarea><br>
+				<span id="newThreadPostWarning" class="formWarning">Must not be empty<br></span>
+				<br>
+				<button id="newThreadSubmitButton">Submit</button>
+			</div>
+		</div>
+		
+		<template id="threadTemplate">
+			<div class="thread">
+				<div class="threadHeader">
+					<span class="threadName"></span>
+					<span class="threadID">#00000</span>
+				</div>
+				<hr>
+				<div class="threadInfo">
+					Opened by <a class="threadAuthor"></a><br>
+					Last post was <span class="threadUpdateTime"></span>
+				</div>
+			</div>
+		</template>
+		<template id="postTemplate">
+			<div class="post">
+				<div class="postLeft">
+					<span class="postAuthor"></span><br>
+					<span class="postAuthorPostCount"></span><br>
+					<span class="postAuthorRegistered"></span>
+				</div>
+				<div class="postRight">
+					<div class="postHeader">
+						<span class="postDate"></span>
+						<span class="postID">#00000</span>
+					</div>
+					<hr>
+					<div class="postContent"></div>
+				</div>
+			</div>
+		</template>
+		<template id="newPostTemplate">
+			<div class="newPost">
+				<span class="newPostHeader">Post something:</span>
+				<div class="newPostTextbox" contenteditable="true"></div>
+				<div class="newPostFooter">
+					<button class="newPostSubmit">Submit</button>
+				</div>
+			</div>
+		</template>
+		
+		<script src="serverConnector.js"></script>
+		<script src="index.js"></script>
+	</body>
+</html>
