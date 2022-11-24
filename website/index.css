@@ -201,6 +201,9 @@ a:hover {
 	width: 100%;
 	aspect-ratio: 16/9;
 }
+.postImage {
+	width: 100%;
+}
 
 .newPost {
 	margin: .5em 1em;
