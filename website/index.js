@@ -282,7 +282,6 @@ function openOverlay(overlay) {
 // button events
 forumName.addEventListener("click", function() {
 	showHomepage(0);
-	history.pushState()
 });
 logoutButton.addEventListener("click", logout);
 overlayBackdrop.addEventListener("click", closeOverlays);
@@ -381,8 +380,14 @@ newThreadSubmitButton.addEventListener("click", function() {
 		return;
 	}
 	createThread(newThreadName.value, newThreadPost.value).then(threadID => {
-		closeOverlays();
-		showThread(threadID, 0);
+		if (threadID >= 0) {
+			closeOverlays();
+			showThread(threadID, 0);
+			newThreadName.value = "";
+			newThreadPost.value = "";
+		} else {
+			alert("Failed to create thread.");
+		}
 	});
 });
 
