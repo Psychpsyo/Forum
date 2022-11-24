@@ -119,7 +119,8 @@ def getThreads(userID, token, page, threadsPerPage):
 	threads = []
 	for thread in cur.execute("SELECT id, author, name, date, lastPostDate FROM threads ORDER BY lastPostDate DESC LIMIT ?, ?", (page * threadsPerPage, threadsPerPage)).fetchall():
 		threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (thread[0],)).fetchone()
-		threads.append({"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0]})
+		lastPost = cur.execute("SELECT id, author, content, date FROM posts WHERE thread = ? ORDER BY date DESC", (thread[0],)).fetchone()
+		threads.append({"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3]}})
 	return threads
 
 # gets the total number of threads on the forum
@@ -175,7 +176,8 @@ def getThreadInfo(userID, token, threadID):
 	
 	thread = cur.execute("SELECT id, author, name, date, lastPostDate FROM threads WHERE id = ?", (threadID,)).fetchone()
 	threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (threadID,)).fetchone()
-	return {"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0]}
+	lastPost = cur.execute("SELECT id, author, content, date FROM posts WHERE thread = ? ORDER BY date DESC", (threadID,)).fetchone()
+	return {"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3]}}
 
 # deletes a given token from the DB
 def invalidateToken(userID, token):

@@ -20,6 +20,7 @@ async function showHomepage(page, fromHistory = false) {
 	// load all authors before writing anything to the page
 	for (const thread of threadList.threads) {
 		await getUserInfo(thread.author);
+		await getUserInfo(thread.lastPost.author);
 	}
 	let forumInfo = await getForumInfo();
 	let newestUser = await getUserInfo(forumInfo.newestUser);
@@ -36,9 +37,7 @@ async function showHomepage(page, fromHistory = false) {
 	let newestUserLink = document.createElement("a");
 	newestUserLink.textContent = newestUser.name;
 	newestUserLink.dataset.userId = newestUser.id;
-	newestUserLink.addEventListener("click", function(e) {
-		showUser(parseInt(this.dataset.userId));
-	});
+	newestUserLink.addEventListener("click", userNameClicked);
 	infoBox.appendChild(newestUserLink);
 	infoBox.appendChild(document.createTextNode("."));
 	pageContent.appendChild(infoBox);
@@ -60,15 +59,15 @@ async function showHomepage(page, fromHistory = false) {
 		threadTemplate.content.querySelector(".threadUpdateTime").title = thread.lastPostDate + "(UTC)";
 		threadTemplate.content.querySelector(".threadAuthor").textContent = "@" + (await getUserInfo(thread.author)).name;
 		threadTemplate.content.querySelector(".threadAuthor").dataset.userId = thread.author;
+		threadTemplate.content.querySelector(".threadLastPoster").textContent = "@" + (await getUserInfo(thread.lastPost.author)).name;
+		threadTemplate.content.querySelector(".threadLastPoster").dataset.userId = thread.lastPost.author;
 		
 		let threadElement = threadTemplate.content.firstElementChild.cloneNode(true);
 		threadElement.addEventListener("click", function() {
 			showThread(parseInt(this.dataset.threadId), 0);
 		});
-		threadElement.querySelector(".threadAuthor").addEventListener("click", function(e) {
-			showUser(parseInt(this.dataset.userId));
-			e.stopPropagation();
-		});
+		threadElement.querySelector(".threadAuthor").addEventListener("click", userNameClicked);
+		threadElement.querySelector(".threadLastPoster").addEventListener("click", userNameClicked);
 		pageContent.appendChild(threadElement);
 	}
 	let paginationBottom = buildPagination(page, Math.floor((threadList.threadCount - 1) / 10), function() {

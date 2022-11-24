@@ -32,6 +32,11 @@ function dateStringToAgoTime(dateString) {
 	return timeAgo + " " + timeUnit + (timeAgo == 1? "" : "s") + " ago";
 }
 
+function userNameClicked(e) {
+	showUser(parseInt(this.dataset.userId));
+	e.stopPropagation();
+}
+
 function buildPageLink(page, current, pageClickEvent) {
 	let pageLink = document.createElement(page == current? "span" : "a");
 	pageLink.textContent = "" + (page + 1);
@@ -93,8 +98,6 @@ async function buildPost(postInfo) {
 	postTemplate.content.querySelector(".postContent").textContent = postInfo.content;
 	
 	let postElement = postTemplate.content.firstElementChild.cloneNode(true);
-	postElement.querySelector(".postAuthor").addEventListener("click", function() {
-		showUser(parseInt(this.dataset.userId));
-	});
+	postElement.querySelector(".postAuthor").addEventListener("click", userNameClicked);
 	return postElement;
 }
