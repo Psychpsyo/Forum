@@ -90,7 +90,7 @@ async function showThread(threadID, page, fromHistory = false) {
 	}
 	pageTitleText.textContent = "Thread: \"" + threadInfo.name + "\"";
 	pageContent.innerHTML = "";
-	let paginationTop = buildPagination(page, Math.floor((threadInfo.postCount - 1) / 15), function() {
+	let paginationTop = buildPagination(page, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 		showThread(threadID, parseInt(this.dataset.page));
 	});
 	pageContent.appendChild(paginationTop);
@@ -116,12 +116,12 @@ async function showThread(threadID, page, fromHistory = false) {
 			alert("Failed to create post.");
 		} else {
 			let threadInfo = await getThreadInfo(threadID);
-			showThread(threadID, Math.floor((threadInfo.postCount - 1) / 15));
+			showThread(threadID, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))));
 		}
 	});
 	pageContent.appendChild(newPostTextbox);
 	
-	let paginationBottom = buildPagination(page, Math.floor((threadInfo.postCount - 1) / 15), function() {
+	let paginationBottom = buildPagination(page, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 		showThread(threadID, parseInt(this.dataset.page));
 	});
 	pageContent.appendChild(paginationBottom);
@@ -145,7 +145,7 @@ async function showUser(userID, fromHistory = false) {
 	
 	let infoBox = document.createElement("div");
 	infoBox.classList.add("infoBox");
-	infoBox.appendChild(document.createTextNode("Registered " + dateStringToAgoTime(user.registrationDate) + " (" + user.registrationDate + ")"));
+	infoBox.appendChild(document.createTextNode("Registered " + dateStringToAgoTime(user.registrationDate) + " (" + user.registrationDate + " UTC)"));
 	infoBox.appendChild(document.createElement("br"));
 	infoBox.appendChild(document.createTextNode("Created " + user.postCount + " posts since then."));
 	

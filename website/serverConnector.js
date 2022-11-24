@@ -175,7 +175,8 @@ async function getPosts(threadID, page) {
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"threadID": threadID,
-			"page": page
+			"page": page,
+			"postsPerPage": parseInt(localStorage.getItem("postsPerPage"))
 		})
 	});
 	

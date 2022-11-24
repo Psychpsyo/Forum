@@ -44,7 +44,7 @@ class HttpServer(BaseHTTPRequestHandler):
 				return;
 			
 			if query["action"] == "getPosts":
-				posts = db.getPosts(query["userID"], query["token"], query["threadID"], query["page"], 15)
+				posts = db.getPosts(query["userID"], query["token"], query["threadID"], query["page"], min(query["postsPerPage"], 50))
 				self.respondOK({"posts": posts})
 				return;
 			
