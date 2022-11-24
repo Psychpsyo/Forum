@@ -2,6 +2,7 @@
 <html lang="en">
 	<head>
 		<title>Psych's cool forum!</title>
+		<link rel="stylesheet" href="themes.css">
 		<link rel="stylesheet" href="index.css">
 	</head>
 	<body>
@@ -16,6 +17,8 @@
 					<button id="createAccountButton">Create Account</button>
 				</div>
 				<div id="loggedInHeaderOptions">
+					<button id="settingsButton">Settings</button>
+					|
 					<button id="newThreadButton">Create New Thread</button>
 					|
 					<button id="logoutButton">Logout</button>
@@ -93,6 +96,19 @@
 			</div>
 		</div>
 		
+		<div id="settingsOverlay" class="overlay">
+			<div class="overlayTitle">Settings</div>
+			<hr>
+			<div class="overlayBody">
+				<label for="settingsTheme">ForumTheme:</label> 
+				<select id="settingsTheme">
+					<option value="light">Regular</option>
+					<option value="underground">Underground</option>
+					<option value="dark-one">Dark One</option>
+				</select>
+			</div>
+		</div>
+		
 		<template id="threadTemplate">
 			<div class="thread">
 				<div class="threadHeader">
@@ -133,6 +149,8 @@
 			</div>
 		</template>
 		
+		<script src="utility.js"></script>
+		<script src="settings.js"></script>
 		<script src="serverConnector.js"></script>
 		<script src="index.js"></script>
 	</body>

@@ -1,0 +1,26 @@
+.theme-light {
+	--background-image: url("/images/background.png");
+	--background-color-1: white;
+	--background-color-2: lightgray;
+	--accent-color: lightblue;
+	--link-color: #3a5b98;
+	--text-color: black;
+}
+
+.theme-underground {
+	--background-image: url("/images/background-underground.png");
+	--background-color-1: #333;
+	--background-color-2: #181818;
+	--accent-color: #084d56;
+	--link-color: #3a5b98;
+	--text-color: #eee;
+}
+
+.theme-dark-one {
+	--background-image: url("/images/background-dark-one.png");
+	--background-color-1: black;
+	--background-color-2: #181818;
+	--accent-color: #4e0f0f;
+	--link-color: red;
+	--text-color: #eee;
+}
