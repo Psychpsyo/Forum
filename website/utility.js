@@ -95,9 +95,11 @@ async function buildPost(postInfo) {
 	postTemplate.content.querySelector(".postDate").textContent = dateStringToAgoTime(postInfo.date);
 	postTemplate.content.querySelector(".postDate").title = postInfo.date + "(UTC)";
 	postTemplate.content.querySelector(".postID").textContent = "#" + ("" + postInfo.id).padStart(5, "0");
-	postTemplate.content.querySelector(".postContent").textContent = postInfo.content;
 	
 	let postElement = postTemplate.content.firstElementChild.cloneNode(true);
+	for (let elem of toRichHtmlElements(postInfo.content)) {
+		postElement.querySelector(".postContent").appendChild(elem);
+	}
 	postElement.querySelector(".postAuthor").addEventListener("click", userNameClicked);
 	return postElement;
 }

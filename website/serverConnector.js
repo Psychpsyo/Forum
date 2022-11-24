@@ -212,6 +212,7 @@ async function getUserPosts(requestedUserID, page) {
 }
 
 // gets info about a user from the server, then caches it locally.
+// If the user info can't be retrieved, it returns null
 let userCache = {};
 async function getUserInfo(userID) {
 	if (userID in userCache) {
@@ -231,7 +232,7 @@ async function getUserInfo(userID) {
 	});
 	
 	if (!response.ok) {
-		return [];
+		return null;
 	}
 	
 	let data = await response.json();
