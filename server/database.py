@@ -139,6 +139,16 @@ def getPosts(userID, token, threadID, page, postsPerPage):
 		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3]})
 	return posts
 
+# gets one page of posts from a thread
+def getUserPosts(userID, token, requestedUserID, page, postsPerPage):
+	if not authenticateToken(userID, token):
+		return []
+	
+	posts = []
+	for post in cur.execute("SELECT id, author, content, date FROM posts WHERE author = ? ORDER BY date DESC LIMIT ?, ?", (requestedUserID, page * postsPerPage, postsPerPage)):
+		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3]})
+	return posts
+
 def getUserInfo(userID, token, requestedUserID):
 	if not authenticateToken(userID, token):
 		return None

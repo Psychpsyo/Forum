@@ -85,6 +85,26 @@ function buildPagination(current, last, pageClickEvent) {
 	return pagination;
 }
 
+async function buildPost(postInfo) {
+	let author = await getUserInfo(postInfo.author);
+	postTemplate.content.querySelector(".post").dataset.postId = postInfo.id;
+	postTemplate.content.querySelector(".postAuthor").textContent = author.name;
+	postTemplate.content.querySelector(".postAuthor").dataset.userId = author.id;
+	postTemplate.content.querySelector(".postAuthorPostCount").textContent = author.postCount + " post" + (author.postCount == 1? "" : "s");
+	postTemplate.content.querySelector(".postAuthorRegistered").textContent = "registered " + dateStringToAgoTime(author.registrationDate);
+	postTemplate.content.querySelector(".postAuthorRegistered").title = author.registrationDate + "(UTC)";
+	postTemplate.content.querySelector(".postDate").textContent = dateStringToAgoTime(postInfo.date);
+	postTemplate.content.querySelector(".postDate").title = postInfo.date + "(UTC)";
+	postTemplate.content.querySelector(".postID").textContent = "#" + ("" + postInfo.id).padStart(5, "0");
+	postTemplate.content.querySelector(".postContent").textContent = postInfo.content;
+	
+	let postElement = postTemplate.content.firstElementChild.cloneNode(true);
+	postElement.querySelector(".postAuthor").addEventListener("click", function() {
+		showUser(parseInt(this.dataset.userId));
+	});
+	return postElement;
+}
+
 async function showThreadList(page) {
 	let threadList = await getThreads(page);
 	// load all authors before writing anything to the page
@@ -102,11 +122,17 @@ async function showThreadList(page) {
 		threadTemplate.content.querySelector(".threadName").textContent = thread.name;
 		threadTemplate.content.querySelector(".threadID").textContent = "#" + ("" + thread.id).padStart(5, "0");
 		threadTemplate.content.querySelector(".threadUpdateTime").textContent = dateStringToAgoTime(thread.lastPostDate);
+		threadTemplate.content.querySelector(".threadUpdateTime").title = thread.lastPostDate + "(UTC)";
 		threadTemplate.content.querySelector(".threadAuthor").textContent = "@" + (await getUserInfo(thread.author)).name;
+		threadTemplate.content.querySelector(".threadAuthor").dataset.userId = thread.author;
 		
 		let threadElement = threadTemplate.content.firstElementChild.cloneNode(true);
 		threadElement.addEventListener("click", function() {
-			showThread(parseInt(this.dataset.threadId, 10), 0);
+			showThread(parseInt(this.dataset.threadId), 0);
+		});
+		threadElement.querySelector(".threadAuthor").addEventListener("click", function(e) {
+			showUser(parseInt(this.dataset.userId));
+			e.stopPropagation();
 		});
 		pageContent.appendChild(threadElement);
 	}
@@ -131,17 +157,7 @@ async function showThread(threadID, page) {
 	});
 	pageContent.appendChild(paginationTop);
 	for (const post of posts) {
-		let author = await getUserInfo(post.author);
-		postTemplate.content.querySelector(".post").dataset.postId = post.id;
-		postTemplate.content.querySelector(".postAuthor").textContent = author.name;
-		postTemplate.content.querySelector(".postAuthorPostCount").textContent = author.postCount + " post" + (author.postCount == 1? "" : "s");
-		postTemplate.content.querySelector(".postAuthorRegistered").textContent = "registered " + dateStringToAgoTime(author.registrationDate);
-		postTemplate.content.querySelector(".postDate").textContent = dateStringToAgoTime(post.date);
-		postTemplate.content.querySelector(".postID").textContent = "#" + ("" + post.id).padStart(5, "0");
-		postTemplate.content.querySelector(".postContent").textContent = post.content;
-		
-		let postElement = postTemplate.content.firstElementChild.cloneNode(true);
-		pageContent.appendChild(postElement);
+		pageContent.appendChild(await buildPost(post));
 	}
 	
 	pageContent.appendChild(document.createElement("br"));
@@ -174,6 +190,38 @@ async function showThread(threadID, page) {
 	pageContent.appendChild(document.createElement("br"));
 }
 
+async function showUser(userID) {
+	let user = await getUserInfo(userID);
+	let recentPosts = await getUserPosts(userID, 0);
+	pageTitleText.textContent = "User: \"" + user.name + "\"";
+	pageContent.innerHTML = "";
+	
+	let infoHeader = document.createElement("div");
+	infoHeader.classList.add("sectionHeader");
+	infoHeader.textContent = "General Info:"
+	pageContent.appendChild(infoHeader);
+	
+	let infoBox = document.createElement("div");
+	infoBox.classList.add("infoBox");
+	infoBox.appendChild(document.createTextNode("Registered " + dateStringToAgoTime(user.registrationDate) + " (" + user.registrationDate + ")"));
+	infoBox.appendChild(document.createElement("br"));
+	infoBox.appendChild(document.createTextNode("Created " + user.postCount + " posts since then."));
+	
+	pageContent.appendChild(infoBox);
+	
+	let postsHeader = document.createElement("div");
+	postsHeader.classList.add("sectionHeader");
+	postsHeader.textContent = "Recent Posts:"
+	pageContent.appendChild(postsHeader);
+	
+	for (const post of recentPosts) {
+		pageContent.appendChild(await buildPost(post));
+	}
+	
+	pageContent.appendChild(document.createElement("br"));
+}
+
+
 function setLoggedInView() {
 	loggedOutHeaderOptions.style.display = "none";
 	loggedInHeaderOptions.style.display = "block";
@@ -198,8 +246,6 @@ function openOverlay(overlay) {
 forumName.addEventListener("click", function() {showThreadList(0);});
 logoutButton.addEventListener("click", logout);
 overlayBackdrop.addEventListener("click", closeOverlays);
-
-threadTemplate.content.querySelector(".thread")
 
 // account creation
 createAccountButton.addEventListener("click", function() {

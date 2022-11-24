@@ -187,6 +187,29 @@ async function getPosts(threadID, page) {
 	return data["posts"];
 }
 
+async function getUserPosts(requestedUserID, page) {
+	let response = await fetch(apiEndpoint, {
+		method: "POST",
+		headers: {
+			"Content-Type": "text/plain",
+		},
+		body: JSON.stringify({
+			"action": "getUserPosts",
+			"userID": localStorage.getItem("userID"),
+			"token": localStorage.getItem("userToken"),
+			"requestedUserID": requestedUserID,
+			"page": page
+		})
+	});
+	
+	if (!response.ok) {
+		return [];
+	}
+	
+	let data = await response.json();
+	return data["posts"];
+}
+
 // gets info about a user from the server, then caches it locally.
 let userCache = {};
 async function getUserInfo(userID) {

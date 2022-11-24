@@ -48,6 +48,11 @@ class HttpServer(BaseHTTPRequestHandler):
 				self.respondOK({"posts": posts})
 				return;
 			
+			if query["action"] == "getUserPosts":
+				posts = db.getUserPosts(query["userID"], query["token"], query["requestedUserID"], query["page"], 15)
+				self.respondOK({"posts": posts})
+				return;
+			
 			if query["action"] == "getUserInfo":
 				user = db.getUserInfo(query["userID"], query["token"], query["requestedUserID"])
 				self.respondOK({"user": user})
