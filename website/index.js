@@ -37,6 +37,17 @@ function dateStringToAgoTime(dateString) {
 	return timeAgo + " " + timeUnit + (timeAgo == 1? "" : "s") + " ago";
 }
 
+function buildPageLink(page, current, pageClickEvent) {
+	let pageLink = document.createElement(page == current? "span" : "a");
+	pageLink.textContent = "" + (page + 1);
+	if (page != current) {
+		pageLink.dataset.page = page;
+		pageLink.textContent = "" + (page + 1);
+		pageLink.addEventListener("click", pageClickEvent);
+	}
+	return pageLink;
+}
+
 function buildPagination(current, last, pageClickEvent) {
 	let pagination = document.createElement("div");
 	pagination.classList.add("pagination");
@@ -47,11 +58,7 @@ function buildPagination(current, last, pageClickEvent) {
 	
 	let i = 0;
 	while(i < 3 && i <= last) {
-		let pageLink = document.createElement("a");
-		pageLink.dataset.page = i;
-		pageLink.textContent = "" + (i + 1);
-		pageLink.addEventListener("click", pageClickEvent);
-		pagination.appendChild(pageLink);
+		pagination.appendChild(buildPageLink(i, current, pageClickEvent));
 		i++;
 	}
 	if (i < current - 2) {
@@ -61,11 +68,7 @@ function buildPagination(current, last, pageClickEvent) {
 		pagination.appendChild(dotdotdot);
 	}
 	while(i < current + 3 && i <= last) {
-		let pageLink = document.createElement("a");
-		pageLink.dataset.page = i;
-		pageLink.textContent = "" + (i + 1);
-		pageLink.addEventListener("click", pageClickEvent);
-		pagination.appendChild(pageLink);
+		pagination.appendChild(buildPageLink(i, current, pageClickEvent));
 		i++;
 	}
 	if (i < last - 2) {
@@ -75,11 +78,7 @@ function buildPagination(current, last, pageClickEvent) {
 		pagination.appendChild(dotdotdot);
 	}
 	while(i <= last) {
-		let pageLink = document.createElement("a");
-		pageLink.dataset.page = i;
-		pageLink.textContent = "" + (i + 1);
-		pageLink.addEventListener("click", pageClickEvent);
-		pagination.appendChild(pageLink);
+		pagination.appendChild(buildPageLink(i, current, pageClickEvent));
 		i++;
 	}
 	return pagination;
