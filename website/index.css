@@ -2,13 +2,14 @@ html, body {
 	margin: 0;
 	padding: 0;
 	font-family: sans-serif;
-	
+}
+html {
+	background-size: 2vw;
 	background-image: var(--background-image);
 	image-rendering: crisp-edges;
 	image-rendering: pixelated;
 }
 body {
-	background-size: 2vw;
 	image-rendering: auto;
 	color: var(--text-color);
 	transition: color .25s;
