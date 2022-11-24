@@ -87,9 +87,10 @@ def createUser(name, password, inviteCode):
 	
 	password = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())
 	cur.execute("INSERT INTO users (name, password, date) VALUES (?, ?, datetime('now'))", (name, password))
-	token = generateTokenNoCommit(cur.lastrowid)
+	userID = cur.lastrowid
+	token = generateTokenNoCommit(userID)
 	con.commit()
-	return (cur.lastrowid, token)
+	return (userID, token)
 
 # creates a thread and returns its ID or -1 if the thread couldn't be created
 def createThread(authorID, token, name, initialPostContent):
