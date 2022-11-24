@@ -261,7 +261,7 @@ async function hashPassword(username, password) {
 					["deriveKey"]),
 				{"name": "AES-CTR", "length": 256}, // This does not matter, the SubtleCrypto API just wants some algorithm that the resulting key "will be used for" (which is none since we're just using this as a hash)
 				true,
-				[]
+				["encrypt"] // also doesn't matter, but Chromium doesn't like this being empty
 			)
 		))
 	);
