@@ -97,7 +97,7 @@ async function buildPost(postInfo) {
 	postTemplate.content.querySelector(".postID").textContent = "#" + ("" + postInfo.id).padStart(5, "0");
 	
 	let postElement = postTemplate.content.firstElementChild.cloneNode(true);
-	for (let elem of toRichHtmlElements(postInfo.content)) {
+	for (const elem of toRichHtmlElements(postInfo.content)) {
 		postElement.querySelector(".postContent").appendChild(elem);
 	}
 	postElement.querySelector(".postAuthor").addEventListener("click", userNameClicked);

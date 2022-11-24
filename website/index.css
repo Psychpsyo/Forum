@@ -187,7 +187,7 @@ a:hover {
 	display: flex;
 	justify-content: space-between;
 }
-.postContent {
+.postContent, .newPostPreviewBox {
 	margin: .65em;
 	margin-top: 0;
 	padding: .25em .5em;
@@ -222,6 +222,10 @@ a:hover {
 	white-space: pre-wrap;
 	word-break: break-word;
 	font-family: monospace;
+}
+.newPostPreviewBox {
+	display: none;
+	/* the rest of the styling is up with .postContent since they're identical */
 }
 .newPostFooter {
 	display: flex;

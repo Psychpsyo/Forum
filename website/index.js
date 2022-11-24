@@ -109,7 +109,10 @@ async function showThread(threadID, page, fromHistory = false) {
 	let newPostTextbox = newPostTemplate.content.firstElementChild.cloneNode(true);
 	newPostTextbox.querySelector(".newPostSubmit").dataset.threadId = threadID;
 	newPostTextbox.querySelector(".newPostSubmit").addEventListener("click", async function() {
-		let postContent = this.parentElement.parentElement.querySelector(".newPostTextbox").innerText;
+		let postContent = this.closest(".newPost").querySelector(".newPostTextbox").innerText;
+		if (postContent.length == 0) {
+			return;
+		}
 		if (postContent.length > 8000) {
 			alert("That's too long!\nKeep it below 8000 characters, please.");
 			return;
@@ -123,6 +126,29 @@ async function showThread(threadID, page, fromHistory = false) {
 			showThread(threadID, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))));
 		}
 	});
+	
+	newPostTextbox.querySelector(".newPostPreview").addEventListener("click", async function() {
+		let textbox = this.closest(".newPost").querySelector(".newPostTextbox");
+		if (textbox.innerText.length == 0) {
+			return;
+		}
+		let preview = this.closest(".newPost").querySelector(".newPostPreviewBox");
+		if (window.getComputedStyle(textbox).display == "none") {
+			preview.innerHTML = "";
+			preview.style.display = "none";
+			textbox.style.display = "block";
+			this.textContent = "Preview";
+			return;
+		}
+		preview.innerHTML = "";
+		for (const elem of toRichHtmlElements(textbox.innerText)) {
+			preview.appendChild(elem);
+		}
+		textbox.style.display = "none";
+		preview.style.display = "block";
+		this.textContent = "Edit";
+	});
+	
 	pageContent.appendChild(newPostTextbox);
 	
 	let paginationBottom = buildPagination(page, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
