@@ -176,6 +176,7 @@ a:hover {
 	padding: .25em .5em;
 	background-color: white;
 	white-space: pre-wrap;
+	font-family: monospace;
 }
 
 .newPost {
@@ -193,6 +194,7 @@ a:hover {
 	min-height: 4em;
 	margin: .5em 0;
 	white-space: pre-wrap;
+	font-family: monospace;
 }
 .newPostFooter {
 	display: flex;
