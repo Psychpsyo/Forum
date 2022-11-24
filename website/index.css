@@ -218,6 +218,9 @@ a:hover {
 .postHidden {
 	position: relative;
 	display: inline-block;
+	background-color: var(--background-color-2);
+	border-radius: .25em;
+	padding: 0 .25em;
 }
 .postHiddenCover {
 	position: absolute;
@@ -228,6 +231,11 @@ a:hover {
 	background-color: var(--background-color-2);
 	border-radius: .25em;
 	cursor: pointer;
+}
+.postCodeblock {
+	display: inline-block;
+	background-color: var(--background-color-2);
+	padding: 0 .25em;
 }
 .postYoutubeVideo {
 	display: block;

@@ -1,10 +1,11 @@
 let replacementRules = [
 	{ // un-nestable block groups
-		"regex": new RegExp("(([\\*/~_|]{2})[^]+\\2)", "g"),
+		"regex": new RegExp("(([\\*/~_|`]{2})[^]+\\2)", "g"),
 		"overshoot": 1,
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("div");
-			for (const section of toRichHtmlElements(input.substring(2, input.length - 2), 1)) {
+			input = input.substring(overshootMatches[0].length, input.length - overshootMatches[0].length);
+			for (const section of toRichHtmlElements(input, 1)) {
 				elem.appendChild(section);
 			}
 			switch (overshootMatches[0]) {
@@ -28,6 +29,12 @@ let replacementRules = [
 						this.remove();
 					});
 					elem.appendChild(elemCover);
+					break;
+				case "``":
+					// undo all the styling that was done in this
+					elem.innerHTML = "";
+					elem.textContent = input;
+					elem.classList.add("postCodeblock");
 					break;
 			}
 			return elem;
