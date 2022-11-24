@@ -104,7 +104,7 @@ def createThread(authorID, token, name, initialPostContent):
 
 # creates a post and returns its ID or -1 if the post couldn't be created
 def createPost(authorID, token, threadID, content):
-	if not isinstance(content, str) or len(content) == 0 or not authenticateToken(authorID, token):
+	if not isinstance(content, str) or len(content) == 0 or len(content) > 8000 or not authenticateToken(authorID, token):
 		return -1
 	cur.execute("INSERT INTO posts (thread, author, content, date) VALUES (?, ?, ?, datetime('now'))", (threadID, authorID, content))
 	cur.execute("UPDATE threads SET lastPostDate = datetime('now') WHERE id = ?", (threadID,))
