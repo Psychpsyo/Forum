@@ -133,6 +133,7 @@ a:hover {
 	border-radius: 1em;
 	background-color: var(--background-color-2);
 	transition: background-color .25s;
+	cursor: pointer;
 }
 .thread:hover {
 	background-color: var(--accent-color);
