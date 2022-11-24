@@ -72,7 +72,6 @@ class HttpServer(BaseHTTPRequestHandler):
 			self.wfile.write(bytes(json.dumps({"error": "unknown error"}), "utf-8"))
 	
 	def respondOK(self, jsonData):
-		print(jsonData)
 		self.send_response(200)
 		self.send_header("Access-Control-Allow-Origin", "*")
 		self.send_header("Content-type", "application/json")
