@@ -11,6 +11,22 @@ let replacementRules = [
 			return document.createElement("br");
 		}
 	},
+	{ // youtube videos
+		"regex": new RegExp("(https:\/\/www\.youtube\.com\/watch\\?v=\\S+)", "g"),
+		"replacer": function(input) {
+			input = input.replace("youtube.com/watch?v=", "youtube-nocookie.com/embed/");
+			// trims off all extra query parameters
+			if (input.indexOf("&") != -1) {
+				input = input.substring(0, input.indexOf("&"));
+			}
+			let elem = document.createElement("iframe");
+			elem.src = input;
+			elem.classList.add("postYoutubeVideo");
+			elem.frameborder = 0;
+			elem.setAttribute("allowfullScreen", "");
+			return elem;
+		}
+	},
 	{ // regular http/https weblinks
 		"regex": new RegExp("(https?:\/\/\\S+)", "g"),
 		"replacer": function(input) {

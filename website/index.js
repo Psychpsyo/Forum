@@ -16,6 +16,8 @@ async function showHomepage(page, fromHistory = false) {
 		history.pushState({"page": "home", "threadPage": page}, "");
 	}
 	
+	clearUserCache();
+	
 	let threadList = await getThreads(page);
 	// load all authors before writing anything to the page
 	for (const thread of threadList.threads) {
@@ -82,6 +84,8 @@ async function showThread(threadID, page, fromHistory = false) {
 		history.pushState({"page": "thread", "thread": threadID, "threadPage": page}, "");
 	}
 	
+	clearUserCache();
+	
 	let threadInfo = await getThreadInfo(threadID);
 	let posts = await getPosts(threadID, page);
 	// load all authors before writing anything to the page
@@ -132,6 +136,8 @@ async function showUser(userID, fromHistory = false) {
 	if (!fromHistory) {
 		history.pushState({"page": "user", "user": userID}, "");
 	}
+	
+	clearUserCache();
 	
 	let user = await getUserInfo(userID);
 	let recentPosts = await getUserPosts(userID, 0);

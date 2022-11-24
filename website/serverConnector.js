@@ -240,6 +240,10 @@ async function getUserInfo(userID) {
 	return userCache[userID];
 }
 
+function clearUserCache() {
+	userCache = {};
+}
+
 async function getThreadInfo(threadID) {
 	let response = await fetch(apiEndpoint, {
 		method: "POST",

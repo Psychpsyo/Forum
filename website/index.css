@@ -196,6 +196,11 @@ a:hover {
 	word-break: break-word;
 	font-family: monospace;
 }
+.postYoutubeVideo {
+	display: block;
+	width: 100%;
+	aspect-ratio: 16/9;
+}
 
 .newPost {
 	margin: .5em 1em;
