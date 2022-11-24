@@ -1,5 +1,5 @@
 let loggedIn = false;
-let apiEndpoint = window.location.protocol + "//" + window.location.hostname + ":55731/api";
+let apiEndpoint = window.location.protocol + "//" + window.location.hostname + "/api";
 
 async function createAccount(username, password, inviteCode) {
 	await fetch(apiEndpoint, {
