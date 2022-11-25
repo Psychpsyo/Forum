@@ -86,20 +86,82 @@ function buildPagination(current, last, pageClickEvent) {
 
 async function buildPost(postInfo) {
 	let author = await getUserInfo(postInfo.author);
-	postTemplate.content.querySelector(".post").dataset.postId = postInfo.id;
-	postTemplate.content.querySelector(".postAuthor").textContent = author.name;
-	postTemplate.content.querySelector(".postAuthor").dataset.userId = author.id;
-	postTemplate.content.querySelector(".postAuthorPostCount").textContent = author.postCount + " post" + (author.postCount == 1? "" : "s");
-	postTemplate.content.querySelector(".postAuthorRegistered").textContent = "registered " + dateStringToAgoTime(author.registrationDate);
-	postTemplate.content.querySelector(".postAuthorRegistered").title = author.registrationDate + "(UTC)";
-	postTemplate.content.querySelector(".postDate").textContent = dateStringToAgoTime(postInfo.date);
-	postTemplate.content.querySelector(".postDate").title = postInfo.date + "(UTC)";
-	postTemplate.content.querySelector(".postID").textContent = "#" + ("" + postInfo.id).padStart(5, "0");
-	
 	let postElement = postTemplate.content.firstElementChild.cloneNode(true);
-	for (const elem of toRichHtmlElements(postInfo.content)) {
-		postElement.querySelector(".postContent").appendChild(elem);
+	postElement.dataset.postId = postInfo.id;
+	postElement.querySelector(".postAuthor").textContent = author.name;
+	postElement.querySelector(".postAuthor").dataset.userId = author.id;
+	postElement.querySelector(".postAuthorPostCount").textContent = author.postCount + " post" + (author.postCount == 1? "" : "s");
+	postElement.querySelector(".postAuthorRegistered").textContent = "registered " + dateStringToAgoTime(author.registrationDate);
+	postElement.querySelector(".postAuthorRegistered").title = author.registrationDate + "(UTC)";
+	postElement.querySelector(".postDate").textContent = dateStringToAgoTime(postInfo.date);
+	postElement.querySelector(".postDate").title = postInfo.date + "(UTC)";
+	postElement.querySelector(".postID").textContent = "#" + ("" + postInfo.id).padStart(5, "0");
+	if (postInfo.lastEdited) {
+		postElement.querySelector(".postLastEdited").textContent = "(last edited " + dateStringToAgoTime(postInfo.lastEdited) + ")";
+		postElement.querySelector(".postLastEdited").title = postInfo.lastEdited + "(UTC)";
+	} else {
+		postElement.querySelector(".postLastEdited").remove();
 	}
+	
+	fillWithRichHTML(postElement.querySelector(".postContent"), postInfo.content);
 	postElement.querySelector(".postAuthor").addEventListener("click", userNameClicked);
+	if (postInfo.author == parseInt(localStorage.getItem("userID"))) {
+		postElement.querySelector(".postOtherOptions").remove();
+		postElement.querySelector(".postContentEditor").textContent = postInfo.content;
+		
+		postElement.querySelector(".postEdit").addEventListener("click", function() {
+			let displayContent = this.closest(".post").querySelector(".postContent");
+			let editContent = this.closest(".post").querySelector(".postContentEditor");
+			if (window.getComputedStyle(editContent).display == "none") {
+				displayContent.style.display = "none";
+				editContent.style.display = "block";
+				this.closest(".post").querySelector(".postDelete").style.display = "none";
+				this.closest(".post").querySelector(".postEditSubmit").style.display = "inline-block";
+				this.textContent = "Cancel";
+				editContent.focus();
+				return;
+			}
+			// else
+			editContent.style.display = "none";
+			displayContent.style.display = "block";
+			this.closest(".post").querySelector(".postEditSubmit").style.display = "none";
+			this.closest(".post").querySelector(".postDelete").style.display = "inline-block";
+			this.textContent = "Edit";
+		});
+		postElement.querySelector(".postEditSubmit").addEventListener("click", async function() {
+			let postContent = this.closest(".post").querySelector(".postContentEditor").innerText;
+			if (postContent.length == 0) {
+				return;
+			}
+			if (postContent.length > 8000) {
+				alert("That's too long!\nKeep it below 8000 characters, please.");
+				return;
+			}
+			if (await editPost(parseInt(this.closest(".post").dataset.postId), postContent)) {
+				let postElem = this.closest(".post").querySelector(".postContent");
+				postElem.innerHTML = "";
+				fillWithRichHTML(postElem, postContent);
+				this.closest(".post").querySelector(".postContentEditor").style.display = "none";
+				postElem.style.display = "block";
+				this.style.display = "none";
+				this.closest(".post").querySelector(".postDelete").style.display = "inline-block";
+				this.closest(".post").querySelector(".postEdit").textContent = "Edit";
+			} else {
+				alert("Failed to update post.");
+			}
+		});
+		postElement.querySelector(".postDelete").addEventListener("click", async function() {
+			if (window.confirm("Do you really want to delete this post?")) {
+				if (await deletePost(parseInt(this.closest(".post").dataset.postId))) {
+					this.closest(".post").remove();
+				} else {
+					alert("Failed to delete post.");
+				}
+			}
+		});
+	} else {
+		postElement.querySelector(".postOwnerOptions").remove();
+		postElement.querySelector(".postContentEditor").remove();
+	}
 	return postElement;
 }

@@ -37,6 +37,16 @@ class HttpServer(BaseHTTPRequestHandler):
 				self.respondOK({"postID": postID})
 				return;
 			
+			if query["action"] == "deletePost":
+				deleted = db.deletePost(query["userID"], query["token"], query["postID"])
+				self.respondOK({"deleted": deleted})
+				return;
+			
+			if query["action"] == "editPost":
+				edited = db.editPost(query["userID"], query["token"], query["postID"], query["newContent"])
+				self.respondOK({"edited": edited})
+				return;
+			
 			if query["action"] == "getThreads":
 				threads = db.getThreads(query["userID"], query["token"], query["page"], 10)
 				threadCount = db.getThreadCount(query["userID"], query["token"])

@@ -157,7 +157,7 @@ a:hover {
 
 
 /* posts */
-.post {
+.post, .newPost {
 	display: flex;
 	margin: .5em 1em;
 	border-radius: 1em;
@@ -174,31 +174,47 @@ a:hover {
 .postAuthor {
 	font-weight: bold;
 }
-.postAuthorPostCount {
+.postAuthorPostCount, .postAuthorRegistered {
 	font-size: .75em;
 }
-.postAuthorRegistered {
-	font-size: .75em;
-}
-.postRight {
+.postRight, .newPostInside {
 	flex-grow: 1;
-	overflow: hidden;
 }
-.postHeader {
+.postHeader, .newPostHeader {
 	padding: .65em;
 	padding-bottom: 0;
 	display: flex;
 	justify-content: space-between;
 }
-.postContent, .newPostPreviewBox {
-	margin: .65em;
-	margin-top: 0;
-	padding: .25em .5em;
+.postLastEdited {
+	font-size: .65rem;
+	margin-left: .75em;
+}
+.postContent, .newPostTextbox, .newPostPreviewBox, .postContentEditor {
 	background-color: var(--background-color-1);
+	padding: .25em .5em;
+	margin: 0 .65em;
 	white-space: pre-wrap;
 	word-break: break-word;
 	font-family: monospace;
 }
+.newPostTextbox, .newPostPreviewBox {
+	min-height: 4em;
+}
+.newPostPreviewBox, .postContentEditor {
+	display: none;
+}
+.postFooter, .newPostFooter {
+	display: flex;
+	justify-content: end;
+	padding-right: .25em;
+	margin: .65em;
+}
+.postEditSubmit {
+	display: none;
+}
+
+/* post styling */
 .postBold {
 	font-weight: bold;
 	display: inline-block;
@@ -244,34 +260,6 @@ a:hover {
 }
 .postImage {
 	width: 100%;
-}
-
-.newPost {
-	margin: .5em 1em;
-	border-radius: 1em;
-	background-color: var(--background-color-2);
-	padding: .65em;
-}
-.newPostHeader {
-	padding-left: .25em;
-}
-.newPostTextbox {
-	padding: .25em .5em;
-	background-color: var(--background-color-1);
-	min-height: 4em;
-	margin: .5em 0;
-	white-space: pre-wrap;
-	word-break: break-word;
-	font-family: monospace;
-}
-.newPostPreviewBox {
-	display: none;
-	/* the rest of the styling is up with .postContent since they're identical */
-}
-.newPostFooter {
-	display: flex;
-	justify-content: end;
-	padding-right: .25em;
 }
 
 /* pagination */

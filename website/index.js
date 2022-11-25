@@ -134,21 +134,17 @@ async function showThread(threadID, page, fromHistory = false) {
 	
 	newPostTextbox.querySelector(".newPostPreview").addEventListener("click", async function() {
 		let textbox = this.closest(".newPost").querySelector(".newPostTextbox");
-		if (textbox.innerText.length == 0) {
-			return;
-		}
 		let preview = this.closest(".newPost").querySelector(".newPostPreviewBox");
 		if (window.getComputedStyle(textbox).display == "none") {
 			preview.innerHTML = "";
 			preview.style.display = "none";
 			textbox.style.display = "block";
 			this.textContent = "Preview";
+			textbox.focus();
 			return;
 		}
 		preview.innerHTML = "";
-		for (const elem of toRichHtmlElements(textbox.innerText)) {
-			preview.appendChild(elem);
-		}
+		fillWithRichHTML(preview, textbox.innerText);
 		textbox.style.display = "none";
 		preview.style.display = "block";
 		this.textContent = "Edit";

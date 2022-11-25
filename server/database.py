@@ -46,6 +46,7 @@ def init():
 		author INTEGER NOT NULL,
 		content TEXT NOT NULL,
 		date TEXT NOT NULL,
+		lastEdited TEXT,
 		FOREIGN KEY (thread) REFERENCES threads (id),
 		FOREIGN KEY (author) REFERENCES users (id)
 	)""")
@@ -111,6 +112,24 @@ def createPost(authorID, token, threadID, content):
 	con.commit()
 	return cur.lastrowid
 
+# attempts to delete a post on behalf of a user and returns whether or not it succeeded
+def deletePost(userID, token, postID):
+	if not authenticateToken(userID, token):
+		return False
+	
+	deleted = cur.execute("DELETE FROM posts WHERE id = ? AND author = ? ", (postID, userID)).rowcount > 0
+	con.commit()
+	return deleted
+
+# updates the body of a post and returns whether or not it succeeded
+def editPost(userID, token, postID, newContent):
+	if not isinstance(newContent, str) or len(newContent) == 0 or len(newContent) > 8000 or not authenticateToken(userID, token):
+		return False
+	
+	edited = cur.execute("UPDATE posts SET content = ?, lastEdited = datetime('now') WHERE id = ? AND author = ?", (newContent, postID, userID)).rowcount > 0
+	con.commit()
+	return edited
+
 # gets one page of all threads
 def getThreads(userID, token, page, threadsPerPage):
 	if not authenticateToken(userID, token):
@@ -119,8 +138,8 @@ def getThreads(userID, token, page, threadsPerPage):
 	threads = []
 	for thread in cur.execute("SELECT id, author, name, date, lastPostDate FROM threads ORDER BY lastPostDate DESC LIMIT ?, ?", (page * threadsPerPage, threadsPerPage)).fetchall():
 		threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (thread[0],)).fetchone()
-		lastPost = cur.execute("SELECT id, author, content, date FROM posts WHERE thread = ? ORDER BY date DESC", (thread[0],)).fetchone()
-		threads.append({"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3]}})
+		lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC", (thread[0],)).fetchone()
+		threads.append({"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3], "lastEdited": lastPost[4]}})
 	return threads
 
 # gets the total number of threads on the forum
@@ -136,8 +155,8 @@ def getPosts(userID, token, threadID, page, postsPerPage):
 		return []
 	
 	posts = []
-	for post in cur.execute("SELECT id, author, content, date FROM posts WHERE thread = ? ORDER BY date ASC LIMIT ?, ?", (threadID, page * postsPerPage, postsPerPage)):
-		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3]})
+	for post in cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date ASC LIMIT ?, ?", (threadID, page * postsPerPage, postsPerPage)):
+		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3], "lastEdited": post[4]})
 	return posts
 
 # gets one page of posts from a thread
@@ -146,8 +165,8 @@ def getUserPosts(userID, token, requestedUserID, page, postsPerPage):
 		return []
 	
 	posts = []
-	for post in cur.execute("SELECT id, author, content, date FROM posts WHERE author = ? ORDER BY date DESC LIMIT ?, ?", (requestedUserID, page * postsPerPage, postsPerPage)):
-		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3]})
+	for post in cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE author = ? ORDER BY date DESC LIMIT ?, ?", (requestedUserID, page * postsPerPage, postsPerPage)):
+		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3], "lastEdited": post[4]})
 	return posts
 
 def getUserInfo(userID, token, requestedUserID):
@@ -176,8 +195,8 @@ def getThreadInfo(userID, token, threadID):
 	
 	thread = cur.execute("SELECT id, author, name, date, lastPostDate FROM threads WHERE id = ?", (threadID,)).fetchone()
 	threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (threadID,)).fetchone()
-	lastPost = cur.execute("SELECT id, author, content, date FROM posts WHERE thread = ? ORDER BY date DESC", (threadID,)).fetchone()
-	return {"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3]}}
+	lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC", (threadID,)).fetchone()
+	return {"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3], "lastEdited": lastPost[4]}}
 
 # deletes a given token from the DB
 def invalidateToken(userID, token):

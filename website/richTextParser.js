@@ -1,3 +1,10 @@
+// the main function you should use from this file
+function fillWithRichHTML(targetElement, text) {
+	for (const elem of toRichHtmlElements(text)) {
+		targetElement.appendChild(elem);
+	}
+}
+
 let replacementRules = [
 	{ // text formatting
 		"regex": /(((?<!\\)[\*'~_|`]{2})[^]+?\2)/g,

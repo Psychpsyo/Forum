@@ -138,24 +138,39 @@
 				</div>
 				<div class="postRight">
 					<div class="postHeader">
-						<span class="postDate"></span>
+						<span><span class="postDate"></span><span class="postLastEdited"></span></span>
 						<span class="postID">#00000</span>
 					</div>
 					<hr>
 					<div class="postContent"></div>
+					<div class="postContentEditor" contenteditable="true"></div>
+					<div class="postFooter">
+					<div class="postOwnerOptions">
+						<button class="postEdit">Edit</button>
+						|
+						<button class="postDelete">Delete</button>
+						<button class="postEditSubmit">Submit</button>
+					</div>
+					<div class="postOtherOptions">
+						<!--<button class="postQuote">Quote</button>-->
+					</div>
+				</div>
 				</div>
 			</div>
 		</template>
 		<template id="newPostTemplate">
 			<div class="newPost">
-				<span class="newPostHeader">Post something:</span>
-				<div class="newPostTextbox" contenteditable="true"></div>
-				<div class="newPostPreviewBox"></div>
-				<div class="newPostFooter">
-					<div>
-						<button class="newPostPreview">Preview</button>
-						|
-						<button class="newPostSubmit">Submit</button>
+				<div class="newPostInside">
+					<span class="newPostHeader">Post something:</span>
+					<hr>
+					<div class="newPostTextbox" contenteditable="true"></div>
+					<div class="newPostPreviewBox"></div>
+					<div class="newPostFooter">
+						<div>
+							<button class="newPostPreview">Preview</button>
+							|
+							<button class="newPostSubmit">Submit</button>
+						</div>
 					</div>
 				</div>
 			</div>

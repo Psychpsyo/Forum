@@ -143,6 +143,51 @@ async function createPost(threadID, content) {
 	return data["postID"];
 }
 
+async function deletePost(postID) {
+	let response = await fetch(apiEndpoint, {
+		method: "POST",
+		headers: {
+			"Content-Type": "text/plain",
+		},
+		body: JSON.stringify({
+			"action": "deletePost",
+			"userID": localStorage.getItem("userID"),
+			"token": localStorage.getItem("userToken"),
+			"postID": postID
+		})
+	});
+	
+	if (!response.ok) {
+		return false;
+	}
+	
+	let data = await response.json();
+	return data["deleted"];
+}
+
+async function editPost(postID, newContent) {
+	let response = await fetch(apiEndpoint, {
+		method: "POST",
+		headers: {
+			"Content-Type": "text/plain",
+		},
+		body: JSON.stringify({
+			"action": "editPost",
+			"userID": localStorage.getItem("userID"),
+			"token": localStorage.getItem("userToken"),
+			"postID": postID,
+			"newContent": newContent
+		})
+	});
+	
+	if (!response.ok) {
+		return false;
+	}
+	
+	let data = await response.json();
+	return data["edited"];
+}
+
 async function getThreads(page) {
 	let response = await fetch(apiEndpoint, {
 		method: "POST",
