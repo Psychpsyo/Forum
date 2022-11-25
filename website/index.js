@@ -109,7 +109,12 @@ async function showThread(threadID, page, fromHistory = false) {
 	let newPostTextbox = newPostTemplate.content.firstElementChild.cloneNode(true);
 	newPostTextbox.querySelector(".newPostSubmit").dataset.threadId = threadID;
 	newPostTextbox.querySelector(".newPostSubmit").addEventListener("click", async function() {
-		let postContent = this.closest(".newPost").querySelector(".newPostTextbox").innerText;
+		let textbox = this.closest(".newPost").querySelector(".newPostTextbox");
+		let preview = this.closest(".newPost").querySelector(".newPostPreviewBox");
+		preview.innerHTML = "";
+		preview.style.display = "none";
+		textbox.style.display = "block";
+		let postContent = textbox.innerText;
 		if (postContent.length == 0) {
 			return;
 		}
