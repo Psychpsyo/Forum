@@ -70,7 +70,7 @@ let replacementRules = [
 		}
 	},
 	{ // images
-		"regex": new RegExp("(\\[img=https?:\/\/\\S+\\])", "g"),
+		"regex": new RegExp("(\\[img=https?:\/\/\\S+?\\])", "g"),
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			input = input.substring(5, input.length - 1);
@@ -81,7 +81,7 @@ let replacementRules = [
 		}
 	},
 	{ // youtube videos
-		"regex": new RegExp("(\\[vid=https:\/\/www\.youtube\.com\/watch\\?v=\\S+\\])", "g"),
+		"regex": new RegExp("(\\[vid=https:\/\/www\.youtube\.com\/watch\\?v=\\S+?\\])", "g"),
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			input = input.substring(5, input.length - 1);
