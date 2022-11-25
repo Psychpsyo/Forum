@@ -1,6 +1,6 @@
 let replacementRules = [
-	{ // nestable block groups
-		"regex": new RegExp("(([\\*/~_|`]{2})[^]+?\\2)", "g"),
+	{ // text formatting
+		"regex": /(((?<!\\)[\*/~_|`]{2})[^]+?\2)/g,
 		"overshoot": 1,
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("div");
@@ -39,6 +39,13 @@ let replacementRules = [
 					break;
 			}
 			return elem;
+		}
+	},
+	{ // escaped text formatting
+		"regex": /(\\[\*/~_|`]{2})/g,
+		"overshoot": 0,
+		"replacer": function(input, overshootMatches) {
+			return document.createTextNode(input.substring(1));
 		}
 	},
 	{ // [hr] to <hr> elements (can eat a newline before and after)
