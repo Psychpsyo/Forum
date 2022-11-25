@@ -1,6 +1,6 @@
 let replacementRules = [
 	{ // text formatting
-		"regex": /(((?<!\\)[\*/~_|`]{2})[^]+?\2)/g,
+		"regex": /(((?<!\\)[\*'~_|`]{2})[^]+?\2)/g,
 		"overshoot": 1,
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("div");
@@ -14,7 +14,7 @@ let replacementRules = [
 				case "**":
 					elem.classList.add("postBold");
 					break;
-				case "//":
+				case "''":
 					elem.classList.add("postItalics");
 					break;
 				case "~~":
@@ -42,7 +42,7 @@ let replacementRules = [
 		}
 	},
 	{ // escaped text formatting
-		"regex": /(\\[\*/~_|`]{2})/g,
+		"regex": /(\\[\*'~_|`]{2})/g,
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			return document.createTextNode(input.substring(1));
