@@ -5,8 +5,10 @@ let replacementRules = [
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("div");
 			input = input.substring(overshootMatches[0].length, input.length - overshootMatches[0].length);
-			for (const section of toRichHtmlElements(input, 1)) {
-				elem.appendChild(section);
+			if (overshootMatches[0] != "``") {
+				for (const section of toRichHtmlElements(input, 1)) {
+					elem.appendChild(section);
+				}
 			}
 			switch (overshootMatches[0]) {
 				case "**":
@@ -32,7 +34,6 @@ let replacementRules = [
 					break;
 				case "``":
 					// undo all the styling that was done in this
-					elem.innerHTML = "";
 					elem.textContent = input;
 					elem.classList.add("postCodeblock");
 					break;
