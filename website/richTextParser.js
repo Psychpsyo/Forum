@@ -1,12 +1,12 @@
 let replacementRules = [
-	{ // un-nestable block groups
-		"regex": new RegExp("(([\\*/~_|`]{2})[^]+\\2)", "g"),
+	{ // nestable block groups
+		"regex": new RegExp("(([\\*/~_|`]{2})[^]+?\\2)", "g"),
 		"overshoot": 1,
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("div");
 			input = input.substring(overshootMatches[0].length, input.length - overshootMatches[0].length);
 			if (overshootMatches[0] != "``") {
-				for (const section of toRichHtmlElements(input, 1)) {
+				for (const section of toRichHtmlElements(input)) {
 					elem.appendChild(section);
 				}
 			}
