@@ -256,6 +256,29 @@ async function getUserPosts(requestedUserID, page) {
 	return data["posts"];
 }
 
+// returns a location object with the properties of thread and index, being the ID of the thread the post is in and the how many'th in the thread it is.
+async function getPostLocation(postID) {
+	let response = await fetch(apiEndpoint, {
+		method: "POST",
+		headers: {
+			"Content-Type": "text/plain",
+		},
+		body: JSON.stringify({
+			"action": "getPostLocation",
+			"userID": localStorage.getItem("userID"),
+			"token": localStorage.getItem("userToken"),
+			"postID": postID
+		})
+	});
+	
+	if (!response.ok) {
+		return null;
+	}
+	
+	let data = await response.json();
+	return data;
+}
+
 // gets info about a user from the server, then caches it locally.
 // If the user info can't be retrieved, it returns null
 let userCache = {};

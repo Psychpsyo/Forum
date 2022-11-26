@@ -138,7 +138,7 @@ def getThreads(userID, token, page, threadsPerPage):
 	threads = []
 	for thread in cur.execute("SELECT id, author, name, date, lastPostDate FROM threads ORDER BY lastPostDate DESC LIMIT ?, ?", (page * threadsPerPage, threadsPerPage)).fetchall():
 		threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (thread[0],)).fetchone()
-		lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC", (thread[0],)).fetchone()
+		lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC, id DESC", (thread[0],)).fetchone()
 		threads.append({"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3], "lastEdited": lastPost[4]}})
 	return threads
 
@@ -155,7 +155,7 @@ def getPosts(userID, token, threadID, page, postsPerPage):
 		return []
 	
 	posts = []
-	for post in cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date ASC LIMIT ?, ?", (threadID, page * postsPerPage, postsPerPage)):
+	for post in cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date, id LIMIT ?, ?", (threadID, page * postsPerPage, postsPerPage)):
 		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3], "lastEdited": post[4]})
 	return posts
 
@@ -165,9 +165,17 @@ def getUserPosts(userID, token, requestedUserID, page, postsPerPage):
 		return []
 	
 	posts = []
-	for post in cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE author = ? ORDER BY date DESC LIMIT ?, ?", (requestedUserID, page * postsPerPage, postsPerPage)):
+	for post in cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE author = ? ORDER BY date DESC, id DESC LIMIT ?, ?", (requestedUserID, page * postsPerPage, postsPerPage)):
 		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3], "lastEdited": post[4]})
 	return posts
+
+def getPostLocation(userID, token, postID):
+	if not authenticateToken(userID, token):
+		return None
+	
+	thread = cur.execute("SELECT thread FROM posts WHERE id = ?", (postID,)).fetchone()
+	postIndex = cur.execute("SELECT count(*) FROM posts WHERE thread = ? AND (date < (SELECT date FROM posts WHERE id = ?) OR id < ?)", (thread[0], postID, postID)).fetchone()
+	return {"thread": thread[0], "index": postIndex[0]}
 
 def getUserInfo(userID, token, requestedUserID):
 	if not authenticateToken(userID, token):
@@ -195,7 +203,7 @@ def getThreadInfo(userID, token, threadID):
 	
 	thread = cur.execute("SELECT id, author, name, date, lastPostDate FROM threads WHERE id = ?", (threadID,)).fetchone()
 	threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (threadID,)).fetchone()
-	lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC", (threadID,)).fetchone()
+	lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC, id DESC", (threadID,)).fetchone()
 	return {"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3], "lastEdited": lastPost[4]}}
 
 # deletes a given token from the DB

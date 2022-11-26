@@ -63,6 +63,11 @@ class HttpServer(BaseHTTPRequestHandler):
 				self.respondOK({"posts": posts})
 				return;
 			
+			if query["action"] == "getPostLocation":
+				postLocation = db.getPostLocation(query["userID"], query["token"], query["postID"])
+				self.respondOK(postLocation)
+				return;
+			
 			if query["action"] == "getUserInfo":
 				user = db.getUserInfo(query["userID"], query["token"], query["requestedUserID"])
 				self.respondOK({"user": user})

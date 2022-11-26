@@ -28,6 +28,7 @@ async function showHomepage(page, fromHistory = false) {
 	let newestUser = await getUserInfo(forumInfo.newestUser);
 	pageTitleText.textContent = "Homepage";
 	pageContent.innerHTML = "";
+	window.scrollTo(0, 0);
 	
 	let infoBox = document.createElement("div");
 	infoBox.classList.add("infoBox");
@@ -54,22 +55,26 @@ async function showHomepage(page, fromHistory = false) {
 	});
 	pageContent.appendChild(paginationTop);
 	for (const thread of threadList.threads) {
-		threadTemplate.content.querySelector(".thread").dataset.threadId = thread.id;
-		threadTemplate.content.querySelector(".threadName").textContent = thread.name;
-		threadTemplate.content.querySelector(".threadID").textContent = "#" + ("" + thread.id).padStart(5, "0");
-		threadTemplate.content.querySelector(".threadUpdateTime").textContent = dateStringToAgoTime(thread.lastPostDate);
-		threadTemplate.content.querySelector(".threadUpdateTime").title = thread.lastPostDate + "(UTC)";
-		threadTemplate.content.querySelector(".threadAuthor").textContent = "@" + (await getUserInfo(thread.author)).name;
-		threadTemplate.content.querySelector(".threadAuthor").dataset.userId = thread.author;
-		threadTemplate.content.querySelector(".threadLastPoster").textContent = "@" + (await getUserInfo(thread.lastPost.author)).name;
-		threadTemplate.content.querySelector(".threadLastPoster").dataset.userId = thread.lastPost.author;
-		
 		let threadElement = threadTemplate.content.firstElementChild.cloneNode(true);
+		threadElement.dataset.threadId = thread.id;
+		threadElement.querySelector(".threadName").textContent = thread.name;
+		threadElement.querySelector(".threadID").textContent = "#" + ("" + thread.id).padStart(5, "0");
+		threadElement.querySelector(".threadUpdateTime").textContent = dateStringToAgoTime(thread.lastPostDate);
+		threadElement.querySelector(".threadUpdateTime").title = thread.lastPostDate + "(UTC)";
+		threadElement.querySelector(".threadAuthor").textContent = "@" + (await getUserInfo(thread.author)).name;
+		threadElement.querySelector(".threadAuthor").dataset.userId = thread.author;
+		threadElement.querySelector(".threadLastPoster").textContent = "@" + (await getUserInfo(thread.lastPost.author)).name;
+		threadElement.querySelector(".threadLastPoster").dataset.userId = thread.lastPost.author;
+		
 		threadElement.addEventListener("click", function() {
 			showThread(parseInt(this.dataset.threadId), 0);
 		});
 		threadElement.querySelector(".threadAuthor").addEventListener("click", userNameClicked);
 		threadElement.querySelector(".threadLastPoster").addEventListener("click", userNameClicked);
+		threadElement.querySelector(".threadLastPostLink").dataset.postId = thread.lastPost.id;
+		threadElement.querySelector(".threadLastPostLink").addEventListener("click", function() {
+			showPost(parseInt(this.dataset.postId));
+		});
 		pageContent.appendChild(threadElement);
 	}
 	let paginationBottom = buildPagination(page, Math.floor((threadList.threadCount - 1) / 10), function() {
@@ -94,6 +99,7 @@ async function showThread(threadID, page, fromHistory = false) {
 	}
 	pageTitleText.textContent = "Thread: \"" + threadInfo.name + "\"";
 	pageContent.innerHTML = "";
+	window.scrollTo(0, 0);
 	let paginationTop = buildPagination(page, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 		showThread(threadID, parseInt(this.dataset.page));
 	});
@@ -170,6 +176,7 @@ async function showUser(userID, fromHistory = false) {
 	let recentPosts = await getUserPosts(userID, 0);
 	pageTitleText.textContent = "User: \"" + user.name + "\"";
 	pageContent.innerHTML = "";
+	window.scrollTo(0, 0);
 	
 	let infoHeader = document.createElement("div");
 	infoHeader.classList.add("sectionHeader");
@@ -196,6 +203,14 @@ async function showUser(userID, fromHistory = false) {
 	pageContent.appendChild(document.createElement("br"));
 }
 
+async function showPost(postID) {
+	console.log(postID);
+	let postLocation = await getPostLocation(postID);
+	console.log(postLocation);
+	showThread(postLocation.thread, Math.floor(postLocation.index / localStorage.getItem("postsPerPage")));
+	// I would love to make it scroll to a post here but images in the posts above might still be loading in so that doesn't work reliably. :(
+	// awaiting showThread() would be necessary in that case but doesn't fix this.
+}
 
 function setLoggedInView() {
 	loggedOutHeaderOptions.style.display = "none";

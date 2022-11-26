@@ -87,6 +87,7 @@ function buildPagination(current, last, pageClickEvent) {
 async function buildPost(postInfo) {
 	let author = await getUserInfo(postInfo.author);
 	let postElement = postTemplate.content.firstElementChild.cloneNode(true);
+	postElement.id = "post" + postInfo.id;
 	postElement.dataset.postId = postInfo.id;
 	postElement.querySelector(".postAuthor").textContent = author.name;
 	postElement.querySelector(".postAuthor").dataset.userId = author.id;
@@ -96,6 +97,9 @@ async function buildPost(postInfo) {
 	postElement.querySelector(".postDate").textContent = dateStringToAgoTime(postInfo.date);
 	postElement.querySelector(".postDate").title = postInfo.date + "(UTC)";
 	postElement.querySelector(".postID").textContent = "#" + ("" + postInfo.id).padStart(5, "0");
+	postElement.querySelector(".postID").addEventListener("click", function() {
+		showPost(parseInt(this.closest(".post").dataset.postId));
+	});
 	if (postInfo.lastEdited) {
 		postElement.querySelector(".postLastEdited").textContent = "(last edited " + dateStringToAgoTime(postInfo.lastEdited) + ")";
 		postElement.querySelector(".postLastEdited").title = postInfo.lastEdited + "(UTC)";
