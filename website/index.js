@@ -204,9 +204,7 @@ async function showUser(userID, fromHistory = false) {
 }
 
 async function showPost(postID) {
-	console.log(postID);
 	let postLocation = await getPostLocation(postID);
-	console.log(postLocation);
 	showThread(postLocation.thread, Math.floor(postLocation.index / localStorage.getItem("postsPerPage")));
 	// I would love to make it scroll to a post here but images in the posts above might still be loading in so that doesn't work reliably. :(
 	// awaiting showThread() would be necessary in that case but doesn't fix this.
