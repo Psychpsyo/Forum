@@ -56,21 +56,21 @@ let replacementRules = [
 		}
 	},
 	{ // [hr] to <hr> elements (can eat a newline before and after)
-		"regex": new RegExp("(\n?\\[hr\\]\n?)", "g"),
+		"regex": /(\n?\[hr\]\n?)/g,
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			return document.createElement("hr");
 		}
 	},
 	{ // newlines to <br> elements
-		"regex": new RegExp("(\n)", "g"),
+		"regex": /(\n)/g,
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			return document.createElement("br");
 		}
 	},
 	{ // images
-		"regex": new RegExp("(\\[img=https?:\/\/\\S+?\\])", "g"),
+		"regex": /(\[img=https?:\/\/\S+?\])/g,
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			input = input.substring(5, input.length - 1);
@@ -81,11 +81,11 @@ let replacementRules = [
 		}
 	},
 	{ // youtube videos
-		"regex": new RegExp("(\\[vid=https:\/\/www\.youtube\.com\/watch\\?v=\\S+?\\])", "g"),
-		"overshoot": 0,
+		"regex": /(\[vid=https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)\S+?\])/g,
+		"overshoot": 1,
 		"replacer": function(input, overshootMatches) {
 			input = input.substring(5, input.length - 1);
-			input = input.replace("youtube.com/watch?v=", "youtube-nocookie.com/embed/");
+			input = input.replace(overshootMatches[0], "youtube-nocookie.com/embed/");
 			// trims off all extra query parameters
 			if (input.indexOf("&") != -1) {
 				input = input.substring(0, input.indexOf("&"));
@@ -99,7 +99,7 @@ let replacementRules = [
 		}
 	},
 	{ // regular http/https weblinks
-		"regex": new RegExp("(https?:\/\/\\S+)", "g"),
+		"regex": /(https?:\/\/\S+)/g,
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("a");
@@ -110,17 +110,48 @@ let replacementRules = [
 		}
 	},
 	{ // @ handles to actual user links
-		"regex": new RegExp("(@<\\d+>)", "g"),
+		"regex": /(@<\d+>)/g,
 		"overshoot": 0,
 		"replacer": function(input, overshootMatches) {
 			let elem = document.createElement("a");
 			let userID = parseInt(input.substring(2, input.length - 1));
 			getUserInfo(userID).then(user => {
 				elem.textContent = user? "@" + user.name : "Invalid User";
-			})
+			});
 			elem.dataset.userId = userID;
 			elem.addEventListener("click", userNameClicked);
 			return elem;
+		}
+	},
+	{ // # handles to post links
+		"regex": /(#<\d+>)/g,
+		"overshoot": 0,
+		"replacer": function(input, overshootMatches) {
+			let elem = document.createElement("a");
+			let postID = parseInt(input.substring(2, input.length - 1));
+			elem.textContent = "#" + ("" + postID).padStart(5, "0");
+			elem.dataset.postId = postID;
+			elem.addEventListener("click", function() {
+				showPost(parseInt(this.dataset.postId));
+			});
+			return elem;
+		}
+	},
+	{ // # handles for thread links
+		"regex": /(#\[\d+\])/g,
+		"overshoot": 0,
+		"replacer": function(input, overshootMatches) {
+			let elem = document.createElement("a");
+			let threadID = parseInt(input.substring(2, input.length - 1));
+			getThreadInfo(threadID).then(thread => {
+				elem.textContent = thread? "#" + thread.name : "Invalid Thread";
+			});
+			elem.dataset.threadId = threadID;
+			elem.addEventListener("click", function() {
+				showThread(parseInt(this.dataset.threadId), 0);
+			});
+			return elem;
+			//invalid syntax cause I need to work on this more!!!
 		}
 	}
 ]
