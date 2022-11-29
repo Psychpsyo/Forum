@@ -85,7 +85,7 @@ let replacementRules = [
 		"overshoot": 1,
 		"replacer": function(input, overshootMatches) {
 			input = input.substring(5, input.length - 1);
-			input = input.replace(overshootMatches[0], "youtube-nocookie.com/embed/");
+			input = input.replace(overshootMatches[0], "www.youtube-nocookie.com/embed/");
 			// trims off all extra query parameters
 			if (input.indexOf("&") != -1) {
 				input = input.substring(0, input.indexOf("&"));
