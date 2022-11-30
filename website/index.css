@@ -86,6 +86,7 @@ a:hover {
 	padding-top: 40vh;
 	font-size: 1.5em;
 	color: gray;
+	white-space: pre-line;
 }
 
 
@@ -209,7 +210,8 @@ a:hover {
 }
 .postFooter, .newPostFooter {
 	display: flex;
-	justify-content: end;
+	justify-content: space-between;
+	flex-direction: row-reverse;
 	padding-right: .25em;
 	margin: .65em;
 }

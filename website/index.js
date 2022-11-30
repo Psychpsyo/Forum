@@ -4,7 +4,7 @@ if (localStorage.getItem("userToken") != undefined && localStorage.getItem("user
 			setLoggedInView();
 		} else {
 			errorDiv.style.display = "block";
-			errorDiv.innerHTML = "Failed to log in.<br>Please try again later.";
+			errorDiv.innerHTML = "Failed to log in.\nPlease try again later.";
 		}
 	});
 } else {
@@ -15,7 +15,6 @@ async function showHomepage(page, fromHistory = false) {
 	if (!fromHistory) {
 		history.pushState({"page": "home", "threadPage": page}, "");
 	}
-	
 	clearUserCache();
 	
 	let threadList = await getThreads(page);
@@ -28,6 +27,7 @@ async function showHomepage(page, fromHistory = false) {
 	let newestUser = await getUserInfo(forumInfo.newestUser);
 	pageTitleText.textContent = "Homepage";
 	pageContent.innerHTML = "";
+	errorDiv.style.display = "none";
 	window.scrollTo(0, 0);
 	
 	let infoBox = document.createElement("div");
@@ -88,7 +88,6 @@ async function showThread(threadID, page, fromHistory = false) {
 	if (!fromHistory) {
 		history.pushState({"page": "thread", "thread": threadID, "threadPage": page}, "");
 	}
-	
 	clearUserCache();
 	
 	let threadInfo = await getThreadInfo(threadID);
@@ -99,6 +98,7 @@ async function showThread(threadID, page, fromHistory = false) {
 	}
 	pageTitleText.textContent = "Thread: \"" + threadInfo.name + "\"";
 	pageContent.innerHTML = "";
+	errorDiv.style.display = "none";
 	window.scrollTo(0, 0);
 	let paginationTop = buildPagination(page, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 		showThread(threadID, parseInt(this.dataset.page));
@@ -133,6 +133,9 @@ async function showThread(threadID, page, fromHistory = false) {
 		if (newPostID == -1) {
 			alert("Failed to create post.");
 		} else {
+			if (newPostSubscribe.checked) {
+				subscribeToThread(threadID);
+			}
 			let threadInfo = await getThreadInfo(threadID);
 			showThread(threadID, Math.floor((threadInfo.postCount - 1) / parseInt(localStorage.getItem("postsPerPage"))));
 		}
@@ -176,6 +179,7 @@ async function showUser(userID, fromHistory = false) {
 	let recentPosts = await getUserPosts(userID, 0);
 	pageTitleText.textContent = "User: \"" + user.name + "\"";
 	pageContent.innerHTML = "";
+	errorDiv.style.display = "none";
 	window.scrollTo(0, 0);
 	
 	let infoHeader = document.createElement("div");
@@ -203,6 +207,42 @@ async function showUser(userID, fromHistory = false) {
 	pageContent.appendChild(document.createElement("br"));
 }
 
+async function showNotifications(page, fromHistory = false) {
+	if (!fromHistory) {
+		history.pushState({"page": "notifications", "notificationsPage": page}, "");
+	}
+	clearUserCache();
+	
+	let notificationCount = await getNotificationCount();
+	let notifications = await getNotifications(page);
+	// load all authors before writing anything to the page
+	for (const notification of notifications) {
+		await getUserInfo(notification.post.author);
+	}
+	pageTitleText.textContent = "Notifications";
+	pageContent.innerHTML = "";
+	errorDiv.style.display = "none";
+	window.scrollTo(0, 0);
+	
+	if (notifications.length > 0) {
+		let paginationTop = buildPagination(page, Math.floor((notificationCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
+			showNotifications(parseInt(this.dataset.page));
+		});
+		pageContent.appendChild(paginationTop);
+		for (const notification of notifications) {
+			pageContent.appendChild(await buildPost(notification.post));
+		}
+		let paginationBottom = buildPagination(page, Math.floor((notificationCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
+			showNotifications(parseInt(this.dataset.page));
+		});
+		pageContent.appendChild(paginationBottom);
+	} else {
+		errorDiv.style.display = "block";
+		errorDiv.innerHTML = "You have no notifications to show.\n:(";
+	}
+	pageContent.appendChild(document.createElement("br"));
+}
+
 async function showPost(postID) {
 	let postLocation = await getPostLocation(postID);
 	showThread(postLocation.thread, Math.floor(postLocation.index / localStorage.getItem("postsPerPage")));
@@ -215,7 +255,9 @@ function setLoggedInView() {
 	loggedInHeaderOptions.style.display = "block";
 	errorDiv.style.display = "none";
 	pageTitle.style.display = "block";
-	
+	getNotificationCount().then(count => {
+		notificationCount.textContent = count;
+	});
 	showHomepage(0);
 }
 
@@ -233,6 +275,9 @@ function openOverlay(overlay) {
 // button events
 forumName.addEventListener("click", function() {
 	showHomepage(0);
+});
+notificationsButton.addEventListener("click", function() {
+	showNotifications(0);
 });
 logoutButton.addEventListener("click", logout);
 overlayBackdrop.addEventListener("click", closeOverlays);
@@ -332,10 +377,14 @@ newThreadSubmitButton.addEventListener("click", function() {
 	}
 	createThread(newThreadName.value, newThreadPost.value).then(threadID => {
 		if (threadID >= 0) {
+			if (newThreadSubscribe.checked) {
+				subscribeToThread(threadID);
+			}
 			closeOverlays();
 			showThread(threadID, 0);
 			newThreadName.value = "";
 			newThreadPost.value = "";
+			newThreadSubscribe.checked = false;
 		} else {
 			alert("Failed to create thread.");
 		}
@@ -353,6 +402,9 @@ window.addEventListener("popstate", function(e) {
 			break;
 		case "home":
 			showHomepage(e.state.threadPage, true);
+			break;
+		case "notifications":
+			showNotifications(e.state.notificationsPage, true);
 			break;
 	}
 });

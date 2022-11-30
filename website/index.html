@@ -18,6 +18,8 @@
 					<button id="createAccountButton">Create Account</button>
 				</div>
 				<div id="loggedInHeaderOptions">
+					<button id="notificationsButton">Notifications (<span id="notificationCount">0</span>)</button>
+					|
 					<button id="settingsButton">Settings</button>
 					|
 					<button id="newThreadButton">Create New Thread</button>
@@ -92,6 +94,9 @@
 				<label for="newThreadPost">Post:</label><br>
 				<textarea type="text" id="newThreadPost" alt="Enter the initial post content here." rows="7" cols="70"></textarea><br>
 				<span id="newThreadPostWarning" class="formWarning">Must not be empty<br></span>
+				
+				<input type="checkbox" id="newThreadSubscribe" alt="Whether or not you'd like to receive notifications about messages in this thread.">
+				<label for="newThreadSubscribe">Subscribe to this thread</label><br>
 				<br>
 				<button id="newThreadSubmitButton">Submit</button>
 			</div>
@@ -171,6 +176,10 @@
 							<button class="newPostPreview">Preview</button>
 							|
 							<button class="newPostSubmit">Submit</button>
+						</div>
+						<div title="Subscribe to the thread when sending the post.">
+							<input id="newPostSubscribe" type="checkbox" alt="Subscribe to the thread when sending the post.">
+							<label for="newPostSubscribe">Subscribe</label>
 						</div>
 					</div>
 				</div>

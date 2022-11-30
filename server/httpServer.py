@@ -83,6 +83,26 @@ class HttpServer(BaseHTTPRequestHandler):
 				self.respondOK({"thread": thread})
 				return;
 			
+			if query["action"] == "subscribeToThread":
+				subscribed = db.subscribeToThread(query["userID"], query["token"], query["threadID"])
+				self.respondOK({"subscribed": subscribed})
+				return;
+			
+			if query["action"] == "unsubscribeFromThread":
+				unsubscribed = db.unsubscribeFromThread(query["userID"], query["token"], query["threadID"])
+				self.respondOK({"unsubscribed": unsubscribed})
+				return;
+			
+			if query["action"] == "getNotificationCount":
+				count = db.getNotificationCount(query["userID"], query["token"])
+				self.respondOK({"count": count})
+				return;
+			
+			if query["action"] == "getNotifications":
+				notifs = db.getNotifications(query["userID"], query["token"], query["page"], min(query["postsPerPage"], 50))
+				self.respondOK({"notifications": notifs})
+				return;
+			
 			self.send_response(400)
 			self.send_header("Access-Control-Allow-Origin", "*")
 			self.send_header("Content-type", "application/json")

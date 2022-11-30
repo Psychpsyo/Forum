@@ -11,7 +11,7 @@ cur = con.cursor()
 # Initializes the Database
 def init():
 	# users with accounts
-	cur.execute("""CREATE TABLE users(
+	cur.execute("""CREATE TABLE IF NOT EXISTS users(
 		id INTEGER PRIMARY KEY,
 		name TEXT NOT NULL,
 		password TEXT NOT NULL,
@@ -21,7 +21,7 @@ def init():
 	)""")
 	
 	# the user's auth tokens
-	cur.execute("""CREATE TABLE tokens(
+	cur.execute("""CREATE TABLE IF NOT EXISTS tokens(
 		id INTEGER PRIMARY KEY,
 		user INTEGER NOT NULL,
 		token TEXT NOT NULL,
@@ -30,7 +30,7 @@ def init():
 	)""")
 	
 	# threads that posts go into
-	cur.execute("""CREATE TABLE threads(
+	cur.execute("""CREATE TABLE IF NOT EXISTS threads(
 		id INTEGER PRIMARY KEY,
 		author INTEGER NOT NULL,
 		name TEXT NOT NULL,
@@ -40,7 +40,7 @@ def init():
 	)""")
 	
 	# posts written by users
-	cur.execute("""CREATE TABLE posts(
+	cur.execute("""CREATE TABLE IF NOT EXISTS posts(
 		id INTEGER PRIMARY KEY,
 		thread INTEGER NOT NULL,
 		author INTEGER NOT NULL,
@@ -52,9 +52,28 @@ def init():
 	)""")
 	
 	# currently available invite codes
-	cur.execute("""CREATE TABLE inviteCodes(
+	cur.execute("""CREATE TABLE IF NOT EXISTS inviteCodes(
 		id INTEGER PRIMARY KEY,
 		code INTEGER NOT NULL
+	)""")
+	
+	# user thread subscriptions
+	cur.execute("""CREATE TABLE IF NOT EXISTS threadSubscriptions(
+		id INTEGER PRIMARY KEY,
+		thread INTEGER NOT NULL,
+		user INTEGER NOT NULL,
+		FOREIGN KEY (thread) REFERENCES threads (id) ON DELETE CASCADE,
+		FOREIGN KEY (user) REFERENCES users (id) ON DELETE CASCADE
+	)""")
+	
+	# user post notifications
+	cur.execute("""CREATE TABLE IF NOT EXISTS postNotifications(
+		id INTEGER PRIMARY KEY,
+		post INTEGER NOT NULL,
+		user INTEGER NOT NULL,
+		reason TEXT NOT NULL,
+		FOREIGN KEY (post) REFERENCES posts (id) ON DELETE CASCADE,
+		FOREIGN KEY (user) REFERENCES users (id) ON DELETE CASCADE
 	)""")
 	
 	con.commit()
@@ -75,6 +94,7 @@ def generateTokenNoCommit(forUserID):
 
 # takes a username and unencrypted password and returns the user's ID and initial token as a tuple (or -1 and "" if the user couldn't be inserted)
 def createUser(name, password, inviteCode):
+	name = name[:100]
 	if not isinstance(name, str) or len(name) == 0 or not isinstance(password, str) or len(password) == 0:
 		return (-1, None)
 	# check if a user with that name already exists
@@ -95,6 +115,7 @@ def createUser(name, password, inviteCode):
 
 # creates a thread and returns its ID or -1 if the thread couldn't be created
 def createThread(authorID, token, name, initialPostContent):
+	name = name[:100]
 	if not isinstance(name, str) or len(name) == 0 or not authenticateToken(authorID, token):
 		return -1
 	cur.execute("INSERT INTO threads (author, name, date, lastPostDate) VALUES (?, ?, datetime('now'), datetime('now'))", (authorID, name))
@@ -108,9 +129,11 @@ def createPost(authorID, token, threadID, content):
 	if not isinstance(content, str) or len(content) == 0 or len(content) > 8000 or not authenticateToken(authorID, token):
 		return -1
 	cur.execute("INSERT INTO posts (thread, author, content, date) VALUES (?, ?, ?, datetime('now'))", (threadID, authorID, content))
+	postID = cur.lastrowid
 	cur.execute("UPDATE threads SET lastPostDate = datetime('now') WHERE id = ?", (threadID,))
+	cur.execute("INSERT INTO postNotifications (post, user, reason) SELECT ?, user, 'newInSubscribedThread' FROM threadSubscriptions WHERE thread = ? AND user != ?", (postID, threadID, authorID))
 	con.commit()
-	return cur.lastrowid
+	return postID
 
 # attempts to delete a post on behalf of a user and returns whether or not it succeeded
 def deletePost(userID, token, postID):
@@ -205,6 +228,45 @@ def getThreadInfo(userID, token, threadID):
 	threadPostCount = cur.execute("SELECT COUNT(*) FROM posts WHERE thread = ?", (threadID,)).fetchone()
 	lastPost = cur.execute("SELECT id, author, content, date, lastEdited FROM posts WHERE thread = ? ORDER BY date DESC, id DESC", (threadID,)).fetchone()
 	return {"id": thread[0], "author": thread[1], "name": thread[2], "date": thread[3], "lastPostDate": thread[4], "postCount": threadPostCount[0], "lastPost": {"id": lastPost[0], "author": lastPost[1], "content": lastPost[2], "date": lastPost[3], "lastEdited": lastPost[4]}}
+
+def subscribeToThread(userID, token, threadID):
+	if not authenticateToken(userID, token):
+		return False
+	
+	if cur.execute("SELECT COUNT(*) FROM threadSubscriptions WHERE user = ? AND thread = ? ", (userID, threadID)).fetchone()[0] > 0:
+		return False
+	
+	subscribed = cur.execute("INSERT INTO threadSubscriptions (thread, user) VALUES (?, ?)", (threadID, userID)).rowcount > 0
+	con.commit()
+	return subscribed
+
+def unsubscribeFromThread(userID, token, threadID):
+	if not authenticateToken(userID, token):
+		return False
+	
+	unsubscribed = cur.execute("DELETE FROM threadSubscriptions WHERE user = ? AND thread = ? ", (userID, threadID)).rowcount > 0
+	con.commit()
+	return unsubscribed
+
+def getNotificationCount(userID, token):
+	if not authenticateToken(userID, token):
+		return 0
+	
+	count = cur.execute("SELECT COUNT(*) FROM postNotifications WHERE user = ?", (userID,)).fetchone()
+	return count[0]
+
+def getNotifications(userID, token, page, postsPerPage):
+	if not authenticateToken(userID, token):
+		return []
+	
+	notifications = []
+	for notification in cur.execute("SELECT posts.id, author, content, date, lastEdited, reason FROM postNotifications INNER JOIN posts on post = posts.id WHERE user = ? ORDER BY date DESC, posts.id DESC LIMIT ?, ?", (userID, page * postsPerPage, postsPerPage)):
+		notifications.append({
+			"post": {"id": notification[0], "author": notification[1], "content": notification[2], "date": notification[3], "lastEdited": notification[4]},
+			"reason": notification[5]
+		})
+	
+	return notifications
 
 # deletes a given token from the DB
 def invalidateToken(userID, token):
