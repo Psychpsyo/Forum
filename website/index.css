@@ -161,11 +161,16 @@ a:hover {
 
 
 /* posts */
-.post, .newPost {
-	display: flex;
+.post, .newPost, .notification {
 	margin: .5em 1em;
 	border-radius: 1em;
 	background-color: var(--background-color-2);
+}
+.post, .newPost {
+	display: flex;
+}
+.notification > .post: {
+	margin: 0;
 }
 .postLeft {
 	padding: .65em;
@@ -184,11 +189,14 @@ a:hover {
 .postRight, .newPostInside {
 	flex-grow: 1;
 }
-.postHeader, .newPostHeader {
+.postHeader, .newPostHeader, .notificationHeader {
 	padding: .65em;
 	padding-bottom: 0;
 	display: flex;
 	justify-content: space-between;
+}
+.notificationReason {
+	font-weight: bold;
 }
 .postLastEdited {
 	font-size: .65rem;

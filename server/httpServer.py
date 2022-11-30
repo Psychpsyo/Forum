@@ -103,6 +103,11 @@ class HttpServer(BaseHTTPRequestHandler):
 				self.respondOK({"notifications": notifs})
 				return;
 			
+			if query["action"] == "removeNotification":
+				removed = db.removeNotification(query["userID"], query["token"], query["notificationID"])
+				self.respondOK({"removed": removed})
+				return;
+			
 			self.send_response(400)
 			self.send_header("Access-Control-Allow-Origin", "*")
 			self.send_header("Content-type", "application/json")

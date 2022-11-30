@@ -260,13 +260,23 @@ def getNotifications(userID, token, page, postsPerPage):
 		return []
 	
 	notifications = []
-	for notification in cur.execute("SELECT posts.id, author, content, date, lastEdited, reason FROM postNotifications INNER JOIN posts on post = posts.id WHERE user = ? ORDER BY date DESC, posts.id DESC LIMIT ?, ?", (userID, page * postsPerPage, postsPerPage)):
+	for notification in cur.execute("SELECT posts.id, author, content, date, lastEdited, postNotifications.id, reason FROM postNotifications INNER JOIN posts on post = posts.id WHERE user = ? ORDER BY date DESC, posts.id DESC LIMIT ?, ?", (userID, page * postsPerPage, postsPerPage)):
 		notifications.append({
 			"post": {"id": notification[0], "author": notification[1], "content": notification[2], "date": notification[3], "lastEdited": notification[4]},
-			"reason": notification[5]
+			"id": notification[5],
+			"reason": notification[6]
 		})
 	
 	return notifications
+
+# attempts to remove a notification on behalf of a user and returns whether or not it succeeded
+def removeNotification(userID, token, notificationID):
+	if not authenticateToken(userID, token):
+		return False
+	
+	removed = cur.execute("DELETE FROM postNotifications WHERE id = ? AND user = ? ", (notificationID, userID)).rowcount > 0
+	con.commit()
+	return removed
 
 # deletes a given token from the DB
 def invalidateToken(userID, token):

@@ -230,7 +230,22 @@ async function showNotifications(page, fromHistory = false) {
 		});
 		pageContent.appendChild(paginationTop);
 		for (const notification of notifications) {
-			pageContent.appendChild(await buildPost(notification.post));
+			let notifElement = notificationTemplate.content.firstElementChild.cloneNode(true);
+			notifElement.id = "notification" + notification.id;
+			notifElement.dataset.notificationId = notification.id;
+			notifElement.querySelector(".notificationReason").textContent = "New post in a thread you are subscribed to:";
+			notifElement.appendChild(await buildPost(notification.post));
+			
+			notifElement.querySelector(".removeNotificationButton").addEventListener("click", async function() {
+				let id = parseInt(this.closest(".notification").dataset.notificationId);
+				if (await removeNotification(id)) {
+					document.getElementById("notification" + id).remove();
+				} else {
+					alert("Failed to remove notification");
+				}
+			});
+			
+			pageContent.appendChild(notifElement);
 		}
 		let paginationBottom = buildPagination(page, Math.floor((notificationCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 			showNotifications(parseInt(this.dataset.page));
