@@ -6,106 +6,91 @@ import json
 class HttpServer(BaseHTTPRequestHandler):
 	def do_POST(self):
 		try:
+			action = self.path.strip("/")
 			query = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))))
-			if query["action"] == "createAccount":
+			if action == "createAccount":
 				userInfo = db.createUser(query["name"], query["password"], query["inviteCode"])
 				self.respondOK({"userID": userInfo[0], "token": userInfo[1]})
 				return;
 			
-			if query["action"] == "login":
+			if action == "login":
 				userInfo = db.getTokenAndID(query["name"], query["password"])
 				self.respondOK({"userID": userInfo[0], "token": userInfo[1]})
 				return;
 			
-			if query["action"] == "logout":
+			if action == "logout":
 				db.invalidateToken(query["userID"], query["token"])
 				self.respondOK(None)
 				return;
 			
-			if query["action"] == "verifyToken":
-				isValid = db.authenticateToken(query["userID"], query["token"])
-				self.respondOK({"verified": isValid})
+			if action == "verifyToken":
+				self.respondOK({"verified": db.authenticateToken(query["userID"], query["token"])})
 				return;
 			
-			if query["action"] == "createThread":
-				threadID = db.createThread(query["userID"], query["token"], query["title"], query["content"])
-				self.respondOK({"threadID": threadID})
+			if action == "createThread":
+				self.respondOK({"threadID": db.createThread(query["userID"], query["token"], query["title"], query["content"])})
 				return;
 			
-			if query["action"] == "createPost":
-				postID = db.createPost(query["userID"], query["token"], query["threadID"], query["content"])
-				self.respondOK({"postID": postID})
+			if action == "createPost":
+				self.respondOK({"postID": db.createPost(query["userID"], query["token"], query["threadID"], query["content"])})
 				return;
 			
-			if query["action"] == "deletePost":
-				deleted = db.deletePost(query["userID"], query["token"], query["postID"])
-				self.respondOK({"deleted": deleted})
+			if action == "deletePost":
+				self.respondOK({"deleted": db.deletePost(query["userID"], query["token"], query["postID"])})
 				return;
 			
-			if query["action"] == "editPost":
-				edited = db.editPost(query["userID"], query["token"], query["postID"], query["newContent"])
-				self.respondOK({"edited": edited})
+			if action == "editPost":
+				self.respondOK({"edited": db.editPost(query["userID"], query["token"], query["postID"], query["newContent"])})
 				return;
 			
-			if query["action"] == "getThreads":
+			if action == "getThreads":
 				threads = db.getThreads(query["userID"], query["token"], query["page"], 10)
 				threadCount = db.getThreadCount(query["userID"], query["token"])
 				self.respondOK({"threads": threads, "threadCount": threadCount})
 				return;
 			
-			if query["action"] == "getPosts":
-				posts = db.getPosts(query["userID"], query["token"], query["threadID"], query["page"], min(query["postsPerPage"], 50))
-				self.respondOK({"posts": posts})
+			if action == "getPosts":
+				self.respondOK({"posts": db.getPosts(query["userID"], query["token"], query["threadID"], query["page"], min(query["postsPerPage"], 50))})
 				return;
 			
-			if query["action"] == "getUserPosts":
-				posts = db.getUserPosts(query["userID"], query["token"], query["requestedUserID"], query["page"], 15)
-				self.respondOK({"posts": posts})
+			if action == "getUserPosts":
+				self.respondOK({"posts": db.getUserPosts(query["userID"], query["token"], query["requestedUserID"], query["page"], 15)})
 				return;
 			
-			if query["action"] == "getPostLocation":
-				postLocation = db.getPostLocation(query["userID"], query["token"], query["postID"])
-				self.respondOK(postLocation)
+			if action == "getPostLocation":
+				self.respondOK(db.getPostLocation(query["userID"], query["token"], query["postID"]))
 				return;
 			
-			if query["action"] == "getUserInfo":
-				user = db.getUserInfo(query["userID"], query["token"], query["requestedUserID"])
-				self.respondOK({"user": user})
+			if action == "getUserInfo":
+				self.respondOK({"user": db.getUserInfo(query["userID"], query["token"], query["requestedUserID"])})
 				return;
 			
-			if query["action"] == "getForumInfo":
-				forumInfo = db.getForumInfo(query["userID"], query["token"])
-				self.respondOK(forumInfo)
+			if action == "getForumInfo":
+				self.respondOK(db.getForumInfo(query["userID"], query["token"]))
 				return;
 			
-			if query["action"] == "getThreadInfo":
-				thread = db.getThreadInfo(query["userID"], query["token"], query["threadID"])
-				self.respondOK({"thread": thread})
+			if action == "getThreadInfo":
+				self.respondOK({"thread": db.getThreadInfo(query["userID"], query["token"], query["threadID"])})
 				return;
 			
-			if query["action"] == "subscribeToThread":
-				subscribed = db.subscribeToThread(query["userID"], query["token"], query["threadID"])
-				self.respondOK({"subscribed": subscribed})
+			if action == "subscribeToThread":
+				self.respondOK({"subscribed": db.subscribeToThread(query["userID"], query["token"], query["threadID"])})
 				return;
 			
-			if query["action"] == "unsubscribeFromThread":
-				unsubscribed = db.unsubscribeFromThread(query["userID"], query["token"], query["threadID"])
-				self.respondOK({"unsubscribed": unsubscribed})
+			if action == "unsubscribeFromThread":
+				self.respondOK({"unsubscribed": db.unsubscribeFromThread(query["userID"], query["token"], query["threadID"])})
 				return;
 			
-			if query["action"] == "getNotificationCount":
-				count = db.getNotificationCount(query["userID"], query["token"])
-				self.respondOK({"count": count})
+			if action == "getNotificationCount":
+				self.respondOK({"count": db.getNotificationCount(query["userID"], query["token"])})
 				return;
 			
-			if query["action"] == "getNotifications":
-				notifs = db.getNotifications(query["userID"], query["token"], query["page"], min(query["postsPerPage"], 50))
-				self.respondOK({"notifications": notifs})
+			if action == "getNotifications":
+				self.respondOK({"notifications": db.getNotifications(query["userID"], query["token"], query["page"], min(query["postsPerPage"], 50))})
 				return;
 			
-			if query["action"] == "removeNotification":
-				removed = db.removeNotification(query["userID"], query["token"], query["notificationID"])
-				self.respondOK({"removed": removed})
+			if action == "removeNotification":
+				self.respondOK({"removed": db.removeNotification(query["userID"], query["token"], query["notificationID"])})
 				return;
 			
 			self.send_response(400)

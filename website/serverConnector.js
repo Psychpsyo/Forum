@@ -1,14 +1,13 @@
 let loggedIn = false;
-let apiEndpoint = window.location.protocol + "//" + window.location.hostname + "/api";
+let apiEndpoint = window.location.protocol + "//" + window.location.hostname + "/api/";
 
 async function createAccount(username, password, inviteCode) {
-	await fetch(apiEndpoint, {
+	await fetch(apiEndpoint + "createAccount", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "createAccount",
 			"name": username,
 			"password": await hashPassword(username, password),
 			"inviteCode": inviteCode
@@ -29,13 +28,12 @@ async function createAccount(username, password, inviteCode) {
 }
 
 async function login(username, password) {
-	await fetch(apiEndpoint, {
+	await fetch(apiEndpoint + "login", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "login",
 			"name": username,
 			"password": await hashPassword(username, password)
 		})
@@ -56,13 +54,12 @@ async function login(username, password) {
 
 // logs out the current session, forgets about its credentials and reloads the page
 async function logout() {
-	await fetch(apiEndpoint, {
+	await fetch(apiEndpoint + "logout", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "logout",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken")
 		})
@@ -73,13 +70,12 @@ async function logout() {
 }
 
 async function verifyToken() {
-	await fetch(apiEndpoint, {
+	await fetch(apiEndpoint + "verifyToken", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "verifyToken",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken")
 		})
@@ -97,13 +93,12 @@ async function verifyToken() {
 }
 
 async function createThread(name, initialMessage) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "createThread", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "createThread",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"title": name,
@@ -121,13 +116,12 @@ async function createThread(name, initialMessage) {
 
 // attempts to create a post and returns its ID or -1 if it failed
 async function createPost(threadID, content) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "createPost", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "createPost",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"threadID": threadID,
@@ -144,13 +138,12 @@ async function createPost(threadID, content) {
 }
 
 async function deletePost(postID) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "deletePost", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "deletePost",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"postID": postID
@@ -166,13 +159,12 @@ async function deletePost(postID) {
 }
 
 async function editPost(postID, newContent) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "editPost", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "editPost",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"postID": postID,
@@ -189,13 +181,12 @@ async function editPost(postID, newContent) {
 }
 
 async function getThreads(page) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getThreads", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getThreads",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"page": page
@@ -210,13 +201,12 @@ async function getThreads(page) {
 }
 
 async function getPosts(threadID, page) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getPosts", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getPosts",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"threadID": threadID,
@@ -234,13 +224,12 @@ async function getPosts(threadID, page) {
 }
 
 async function getUserPosts(requestedUserID, page) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getUserPosts", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getUserPosts",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"requestedUserID": requestedUserID,
@@ -258,13 +247,12 @@ async function getUserPosts(requestedUserID, page) {
 
 // returns a location object with the properties of thread and index, being the ID of the thread the post is in and the how many'th in the thread it is.
 async function getPostLocation(postID) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getPostLocation", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getPostLocation",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"postID": postID
@@ -286,13 +274,12 @@ async function getUserInfo(userID) {
 	if (userID in userCache) {
 		return userCache[userID];
 	}
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getUserInfo", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getUserInfo",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"requestedUserID": userID
@@ -313,13 +300,12 @@ function clearUserCache() {
 }
 
 async function getThreadInfo(threadID) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getThreadInfo", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getThreadInfo",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"threadID": threadID
@@ -335,13 +321,12 @@ async function getThreadInfo(threadID) {
 }
 
 async function getForumInfo() {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getForumInfo", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getForumInfo",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken")
 		})
@@ -356,13 +341,12 @@ async function getForumInfo() {
 }
 
 async function subscribeToThread(threadID) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "subscribeToThread", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "subscribeToThread",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"threadID": threadID
@@ -378,13 +362,12 @@ async function subscribeToThread(threadID) {
 }
 
 async function unsubscribeFromThread(threadID) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "unsubscribeFromThread", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "unsubscribeFromThread",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"threadID": threadID
@@ -400,13 +383,12 @@ async function unsubscribeFromThread(threadID) {
 }
 
 async function getNotificationCount() {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getNotificationCount", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getNotificationCount",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken")
 		})
@@ -421,13 +403,12 @@ async function getNotificationCount() {
 }
 
 async function getNotifications(page) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "getNotifications", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "getNotifications",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"page": page,
@@ -444,13 +425,12 @@ async function getNotifications(page) {
 }
 
 async function removeNotification(notificationID) {
-	let response = await fetch(apiEndpoint, {
+	let response = await fetch(apiEndpoint + "removeNotification", {
 		method: "POST",
 		headers: {
 			"Content-Type": "text/plain",
 		},
 		body: JSON.stringify({
-			"action": "removeNotification",
 			"userID": localStorage.getItem("userID"),
 			"token": localStorage.getItem("userToken"),
 			"notificationID": notificationID
