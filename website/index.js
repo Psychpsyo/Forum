@@ -213,7 +213,7 @@ async function showNotifications(page, fromHistory = false) {
 	}
 	clearUserCache();
 	
-	let notificationCount = await getNotificationCount();
+	let notificationTotal = await getNotificationCount();
 	let notifications = await getNotifications(page);
 	// load all authors before writing anything to the page
 	for (const notification of notifications) {
@@ -225,7 +225,7 @@ async function showNotifications(page, fromHistory = false) {
 	window.scrollTo(0, 0);
 	
 	if (notifications.length > 0) {
-		let paginationTop = buildPagination(page, Math.floor((notificationCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
+		let paginationTop = buildPagination(page, Math.floor((notificationTotal - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 			showNotifications(parseInt(this.dataset.page));
 		});
 		pageContent.appendChild(paginationTop);
@@ -240,6 +240,7 @@ async function showNotifications(page, fromHistory = false) {
 				let id = parseInt(this.closest(".notification").dataset.notificationId);
 				if (await removeNotification(id)) {
 					document.getElementById("notification" + id).remove();
+					notificationCount.textContent -= 1; // thank you javascript for letting me do this, very cool.
 				} else {
 					alert("Failed to remove notification");
 				}
@@ -247,7 +248,7 @@ async function showNotifications(page, fromHistory = false) {
 			
 			pageContent.appendChild(notifElement);
 		}
-		let paginationBottom = buildPagination(page, Math.floor((notificationCount - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
+		let paginationBottom = buildPagination(page, Math.floor((notificationTotal - 1) / parseInt(localStorage.getItem("postsPerPage"))), function() {
 			showNotifications(parseInt(this.dataset.page));
 		});
 		pageContent.appendChild(paginationBottom);
