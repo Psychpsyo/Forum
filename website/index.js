@@ -19,10 +19,14 @@ async function showHomepage(page, fromHistory = false) {
 	
 	let threadList = await getThreads(page);
 	// load all authors before writing anything to the page
-	for (const thread of threadList.threads) {
-		await getUserInfo(thread.author);
-		await getUserInfo(thread.lastPost.author);
-	}
+	let userPromises = threadList.threads.map(thread => {
+		return getUserInfo(thread.author);
+	});
+	userPromises = userPromises.concat(threadList.threads.map(thread => {
+		return getUserInfo(thread.lastPost.author);
+	}));
+	await Promise.all(userPromises);
+	
 	let forumInfo = await getForumInfo();
 	let newestUser = await getUserInfo(forumInfo.newestUser);
 	pageTitleText.textContent = "Homepage";
@@ -93,9 +97,12 @@ async function showThread(threadID, page, fromHistory = false) {
 	let threadInfo = await getThreadInfo(threadID);
 	let posts = await getPosts(threadID, page);
 	// load all authors before writing anything to the page
-	for (const post of posts) {
-		await getUserInfo(post.author);
-	}
+	
+	let userPromises = posts.map(post => {
+		return getUserInfo(post.author);
+	});
+	await Promise.all(userPromises);
+	
 	pageTitleText.textContent = "Thread: \"" + threadInfo.name + "\"";
 	pageContent.innerHTML = "";
 	errorDiv.style.display = "none";
@@ -216,9 +223,11 @@ async function showNotifications(page, fromHistory = false) {
 	let notificationTotal = await getNotificationCount();
 	let notifications = await getNotifications(page);
 	// load all authors before writing anything to the page
-	for (const notification of notifications) {
-		await getUserInfo(notification.post.author);
-	}
+	let userPromises = notifications.map(notification => {
+		return getUserInfo(notification.post.author);
+	});
+	await Promise.all(userPromises);
+	
 	pageTitleText.textContent = "Notifications";
 	pageContent.innerHTML = "";
 	errorDiv.style.display = "none";

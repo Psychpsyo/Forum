@@ -271,27 +271,27 @@ async function getPostLocation(postID) {
 // If the user info can't be retrieved, it returns null
 let userCache = {};
 async function getUserInfo(userID) {
-	if (userID in userCache) {
-		return userCache[userID];
-	}
-	let response = await fetch(apiEndpoint + "getUserInfo", {
-		method: "POST",
-		headers: {
-			"Content-Type": "text/plain",
-		},
-		body: JSON.stringify({
-			"userID": localStorage.getItem("userID"),
-			"token": localStorage.getItem("userToken"),
-			"requestedUserID": userID
+	if (!(userID in userCache)) {
+		userCache[userID] = fetch(apiEndpoint + "getUserInfo", {
+			method: "POST",
+			headers: {
+				"Content-Type": "text/plain",
+			},
+			body: JSON.stringify({
+				"userID": localStorage.getItem("userID"),
+				"token": localStorage.getItem("userToken"),
+				"requestedUserID": userID
+			})
 		})
-	});
-	
-	if (!response.ok) {
-		return null;
+		.then(response => response.json())
+		.then(data => {
+			return data["user"];
+		})
+		.catch(error => {
+			return undefined;
+		});
 	}
 	
-	let data = await response.json();
-	userCache[userID] = data["user"];
 	return userCache[userID];
 }
 
