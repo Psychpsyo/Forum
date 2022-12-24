@@ -182,7 +182,7 @@ def getPosts(userID, token, threadID, page, postsPerPage):
 		posts.append({"id": post[0], "author": post[1], "content": post[2], "date": post[3], "lastEdited": post[4]})
 	return posts
 
-# gets one page of posts from a thread
+# gets one page of posts of a user
 def getUserPosts(userID, token, requestedUserID, page, postsPerPage):
 	if not authenticateToken(userID, token):
 		return []
